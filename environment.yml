@@ -45,3 +45,9 @@ dependencies:
     - sphinx-rtd-theme
     - sphinxcontrib-bibtex
 
+    - yfinance
+    - seabornp
+    - statsmodels
+    - intrinio_sdk
+    - pandas_datareader
+
