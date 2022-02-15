@@ -1,0 +1,20 @@
+name: Scraper_env
+channels:
+  - conda-forge
+  - plotly
+
+  - r
+
+  - pip:
+    -urllib.requests
+    -json
+    -time
+    -os
+    -pandas
+    -numpy
+    -multiprocessing.dummy
+    -bs4
+    -selenium
+    -random
+    -scipy
+    -datetime
