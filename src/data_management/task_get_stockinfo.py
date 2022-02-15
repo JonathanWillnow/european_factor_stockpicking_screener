@@ -20,10 +20,18 @@ from src.data_management.stockinfo_scraper import get_stock_data
 def save_data(sample, path):
     sample.to_csv(path, encoding = 'utf-8')
 
-url = "https://traderfox.de/aktien/alle-nasdaq-aktien-bestandteile"
-index_exchange = "DE"
-
-@pytask.mark.produces(BLD / "data" / "DEStocks.csv")
-def task_get_simulation_draws(produces):
-    file = get_stock_data(url, index_exchange)
+@pytask.mark.produces(BLD / "data" / "DE_stocks.csv")
+def task_get_DEStocks(produces):
+    file = get_stock_data("https://traderfox.de/aktien/deutschland-160-bestandteile", "DE")
     save_data(file, produces)
+
+@pytask.mark.produces(BLD / "data" / "EuroStoxx600_stocks.csv")
+def task_get_EuroStoxx600Stocks(produces):
+    file = get_stock_data("https://traderfox.de/aktien/stoxx-europe-600-bestandteile", "EuroStoxx600")
+    save_data(file, produces)
+
+@pytask.mark.produces(BLD / "data" / "NYSE_stocks.csv")
+def task_get_NYSEStocks(produces):
+    file = get_stock_data("https://traderfox.de/aktien/alle-nyse-aktien-bestandteile", "NYSE")
+    save_data(file, produces)
+
