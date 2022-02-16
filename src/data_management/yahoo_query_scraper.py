@@ -157,3 +157,31 @@ def get_data(stockticker):
 
     return(frame)
 
+
+def calc_precentiles(final_frame):
+
+    metrics = {
+            'priceToBook':'PB_percentile',
+            'enterpriseValue': 'EV_percentile',
+            'priceToSalesTrailing12Months' : 'PS_percentile',
+            'enterpriseToRevenue' : "EToRev_precentile",
+            'enterpriseToEbitda' : "EToEbitda_percentile",
+            }
+
+    for row in final_frame.index:
+        for metric in metrics.keys():
+            final_frame.loc[row, metrics[metric]] = stats.percentileofscore(final_frame[metric], final_frame.loc[row, metric])/100
+    
+       # metrics where we have to invert the percentile
+    inv_metrics = {
+            'returnOnEquity' : "ROE_percentile",
+            'FF_Quality_Growth' : "FFQ_growth_percentile",
+            "FF_Quality_actual": "FFQ_actual_percentile"
+            }
+
+    for row in final_frame.index:
+        for metric in inv_metrics.keys():
+            final_frame.loc[row, inv_metrics[metric]] = 1-(stats.percentileofscore(final_frame[metric], final_frame.loc[row, metric])/100)
+    
+    return(final_frame)
+    
