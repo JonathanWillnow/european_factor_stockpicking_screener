@@ -45,9 +45,12 @@ dependencies:
     - sphinx-rtd-theme
     - sphinxcontrib-bibtex
 
+    - numpy
+    - urllib.requests
     - yfinance
-    - seabornp
+    - seaborn
     - statsmodels
     - intrinio_sdk
     - pandas_datareader
+    - multiprocessing
 
