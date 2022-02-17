@@ -12,26 +12,25 @@ The following is planned but is quite complicated to achieve because it is 1) re
 import numpy as np
 import pytask
 
-from src.config import BLD
 from src.config import SRC
 from src.data_management.stockinfo_scraper import get_stock_data
 
 
-def save_data(sample, path):
-    sample.to_csv(path, encoding = 'utf-8')
+# def save_data(sample, path):
+#     sample.to_pickle(path)
 
-@pytask.mark.produces(BLD / "data" / "DE_stocks.csv")
-def task_get_DEStocks(produces):
-    file = get_stock_data("https://traderfox.de/aktien/deutschland-160-bestandteile", "DE")
-    save_data(file, produces)
+# @pytask.mark.produces(SRC / "data_management" / "data" / "de_initial.pkl")
+# def task_get_DEStocks(produces):
+#     file = get_stock_data("https://traderfox.de/aktien/deutschland-160-bestandteile", "DE")
+#     save_data(file, produces)
 
-@pytask.mark.produces(BLD / "data" / "EuroStoxx600_stocks.csv")
-def task_get_EuroStoxx600Stocks(produces):
-    file = get_stock_data("https://traderfox.de/aktien/stoxx-europe-600-bestandteile", "EuroStoxx600")
-    save_data(file, produces)
+# @pytask.mark.produces(SRC / "data_management" / "data" / "eurostoxx600_initial.pkl")
+# def task_get_EuroStoxx600Stocks(produces):
+#     file = get_stock_data("https://traderfox.de/aktien/stoxx-europe-600-bestandteile", "EuroStoxx600")
+#     save_data(file, produces)
 
-@pytask.mark.produces(BLD / "data" / "NYSE_stocks.csv")
-def task_get_NYSEStocks(produces):
-    file = get_stock_data("https://traderfox.de/aktien/alle-nyse-aktien-bestandteile", "NYSE")
-    save_data(file, produces)
+# @pytask.mark.produces(SRC / "data_management" / "data" / "nyse_initial.pkl")
+# def task_get_NYSEStocks(produces):
+#     file = get_stock_data("https://traderfox.de/aktien/alle-nyse-aktien-bestandteile", "NYSE")
+#     save_data(file, produces)
 
