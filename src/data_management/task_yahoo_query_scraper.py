@@ -1,26 +1,20 @@
+from unicodedata import name
 import urllib.request, json , time, os, difflib, itertools
-import pandas as pd
-import numpy as np
-from multiprocessing.dummy import Pool
 from datetime import datetime
 import time
 import numpy as np
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
-import random
-from pandas import ExcelWriter
-from bs4 import BeautifulSoup
 from scipy import stats #The SciPy stats module
-import datetime
+from multiprocessing.pool import ThreadPool
+import pytask
+from src.config import BLD
+from src.config import SRC
+#from src.data_management.stockinfo_scraper import get_stock_data
 
 
-# https://www.reddit.com/r/sheets/comments/ji52uk/yahoo_finance_api_url/ available modules xahoo finance
-stockinfo_csv = pd.read_csv("fama_french/data/StoxxEurope600.csv")  
+
 def get_data(stockticker):
+
     metrics_list = ['enterpriseValue', "marketCap",'forwardPE', "trailingPE", 'profitMargins', 'floatShares', "sharesOutstanding", 
                     'priceToBook', 'heldPercentInsiders', 'bookValue', 'priceToSalesTrailing12Months', 'trailingEps', 'forwardEps',
                     'pegRatio', 'enterpriseToRevenue', 'enterpriseToEbitda', "dividendYield"]
@@ -44,8 +38,8 @@ def get_data(stockticker):
 
         with urllib.request.urlopen(query_url_1) as url:
                     parsed_1 = json.loads(url.read().decode())
-        data_dict["industry"] = stockinfo_csv.industry[stockinfo_csv.ticker == stockticker].values[0]
-        data_dict["de_ticker"] = stockinfo_csv.de_ticker[stockinfo_csv.ticker == stockticker].values[0]
+        data_dict["industry"] = stockinfo_pkl.industry[stockinfo_pkl.ticker == stockticker].values[0]
+        data_dict["de_ticker"] = stockinfo_pkl.de_ticker[stockinfo_pkl.ticker == stockticker].values[0]
     except Exception as e:
         print(e)
         print(stockticker)
@@ -83,35 +77,7 @@ def get_data(stockticker):
             except:
                 pass
     ## FF Quality
-    Fame_French_Quality = ["totalRevenue", "costOfRevenue", "grossProfit", "sellingGeneralAdministrative", "interestExpense", "operatingIncome", "netIncomeFromContinuingOps"]
-    
-    FF_Quality_dict = {}
-    FF_Quality_year_frame = pd.DataFrame({})
-    try:
-        query_url_4 = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/"+str(stock)+"?modules=incomeStatementHistory"
-        with urllib.request.urlopen(query_url_4) as url:
-                    parsed_4 = json.loads(url.read().decode())
-
-        query_url_5 = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/"+str(stock)+"?modules=balanceSheetHistory"
-        with urllib.request.urlopen(query_url_5) as url:
-                    parsed_5 = json.loads(url.read().decode())
-    except Exception as e:
-        print(e)
-        print(stockticker)
-
-    for year in range(0,10):
-        try:
-            for metric in Fame_French_Quality:
-                FF_Quality_dict[metric] = parsed_4["quoteSummary"]["result"][0]["incomeStatementHistory"]["incomeStatementHistory"][year][metric]["raw"]
-            FF_Quality_dict["totalStockholderEquity"] = parsed_5["quoteSummary"]["result"][0]["balanceSheetHistory"]["balanceSheetStatements"][year]["totalStockholderEquity"]["raw"]
-            FF_Quality_dict["year"] = year 
-            # Building FF-Quality Factor 
-            FF_Quality_dict["FF_Quality"] = (FF_Quality_dict["totalRevenue"] - (FF_Quality_dict["costOfRevenue"] + FF_Quality_dict["interestExpense"] + FF_Quality_dict["sellingGeneralAdministrative"])) / FF_Quality_dict["totalStockholderEquity"]
-            FF_Quality_frame = pd.DataFrame.from_dict({stock : FF_Quality_dict}, orient="index")
-            FF_Quality_year_frame = FF_Quality_year_frame.append(FF_Quality_frame)
-        except:
-            break
-
+    FF_Quality_year_frame = calculate_FF_Quality(stock)
     # Calculate Growth rates and report recent and mean FF_Quality Factor
     data_dict["years_available"] = len(FF_Quality_year_frame)
     growth_measures_dict = {
@@ -134,17 +100,8 @@ def get_data(stockticker):
         data_dict["FF_Quality_mean"] = np.nan
 
     
-    FF_Conservative_dict = {}
-    FF_Conservative_year_frame = pd.DataFrame({})
-    # FF Inv
-    for year in range(0,10):
-        try:
-            FF_Conservative_dict["totalAssets"] = parsed_5["quoteSummary"]["result"][0]["balanceSheetHistory"]["balanceSheetStatements"][year]["totalAssets"]["raw"]
-            FF_Conservative_dict["year"] = year 
-            FF_Conservative_frame = pd.DataFrame.from_dict({stock : FF_Conservative_dict}, orient="index")
-            FF_Conservative_year_frame = FF_Conservative_year_frame.append(FF_Conservative_frame)
-        except:
-            break
+    # FF_Conservative
+    FF_Conservative_year_frame = calculate_FF_CA(stock)
     try:
         data_dict["FF_Assets_Growth_mean"] = FF_Conservative_year_frame.sort_values(["year"], ascending=False)[["totalAssets"]].pct_change().mean()[0]
         data_dict["FF_Assets_Growth_actual"] = FF_Conservative_year_frame.sort_values(["year"], ascending=False)[["totalAssets"]].pct_change().iloc[1,0]
@@ -157,31 +114,139 @@ def get_data(stockticker):
 
     return(frame)
 
+def calculate_FF_Quality(stock): 
+
+    Fame_French_Quality = ["totalRevenue", "costOfRevenue", "grossProfit", "sellingGeneralAdministrative", "interestExpense", "operatingIncome", "netIncomeFromContinuingOps"]
+    FF_Quality_dict = {}
+    FF_Quality_year_frame = pd.DataFrame({})
+    try:
+        query_url_4 = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/"+str(stock)+"?modules=incomeStatementHistory"
+        with urllib.request.urlopen(query_url_4) as url:
+                    parsed_4 = json.loads(url.read().decode())
+
+        query_url_5 = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/"+str(stock)+"?modules=balanceSheetHistory"
+        with urllib.request.urlopen(query_url_5) as url:
+                    parsed_5 = json.loads(url.read().decode())
+    except Exception as e:
+        print(e)
+        print(stock)
+
+    for year in range(0,10):
+        try:
+            for metric in Fame_French_Quality:
+                FF_Quality_dict[metric] = parsed_4["quoteSummary"]["result"][0]["incomeStatementHistory"]["incomeStatementHistory"][year][metric]["raw"]
+            FF_Quality_dict["totalStockholderEquity"] = parsed_5["quoteSummary"]["result"][0]["balanceSheetHistory"]["balanceSheetStatements"][year]["totalStockholderEquity"]["raw"]
+            FF_Quality_dict["year"] = year 
+            # Building FF-Quality Factor 
+            FF_Quality_dict["FF_Quality"] = (FF_Quality_dict["totalRevenue"] - (FF_Quality_dict["costOfRevenue"] + FF_Quality_dict["interestExpense"] + FF_Quality_dict["sellingGeneralAdministrative"])) / FF_Quality_dict["totalStockholderEquity"]
+            FF_Quality_frame = pd.DataFrame.from_dict({stock : FF_Quality_dict}, orient="index")
+            FF_Quality_year_frame = FF_Quality_year_frame.append(FF_Quality_frame)
+        except:
+            break
+    return(FF_Quality_year_frame)
+
+
+def calculate_FF_CA(stock): 
+
+    FF_Conservative_dict = {}
+    FF_Conservative_year_frame = pd.DataFrame({})
+    try:
+        query_url_5 = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/"+str(stock)+"?modules=balanceSheetHistory"
+        with urllib.request.urlopen(query_url_5) as url:
+                    parsed_5 = json.loads(url.read().decode())
+    except Exception as e:
+        print(e)
+        print(stock)
+
+    # FF Inv
+    for year in range(0,10):
+        try:
+            FF_Conservative_dict["totalAssets"] = parsed_5["quoteSummary"]["result"][0]["balanceSheetHistory"]["balanceSheetStatements"][year]["totalAssets"]["raw"]
+            FF_Conservative_dict["year"] = year 
+            FF_Conservative_frame = pd.DataFrame.from_dict({stock : FF_Conservative_dict}, orient="index")
+            FF_Conservative_year_frame = FF_Conservative_year_frame.append(FF_Conservative_frame)
+        except:
+            break
+    return(FF_Conservative_year_frame)
+
 
 def calc_precentiles(final_frame):
 
     metrics = {
             'priceToBook':'PB_percentile',
             'enterpriseValue': 'EV_percentile',
+            'marketCap': 'MC_percentile',
             'priceToSalesTrailing12Months' : 'PS_percentile',
             'enterpriseToRevenue' : "EToRev_precentile",
             'enterpriseToEbitda' : "EToEbitda_percentile",
+            "FF_Assets_Growth_mean" : 'FFA_m_percentile',
+            "FF_Assets_Growth_actual" : "FF_Cons_actual_percentile",
             }
-
     for row in final_frame.index:
         for metric in metrics.keys():
-            final_frame.loc[row, metrics[metric]] = stats.percentileofscore(final_frame[metric], final_frame.loc[row, metric])/100
-    
-       # metrics where we have to invert the percentile
+            try:
+                final_frame.loc[row, metrics[metric]] = stats.percentileofscore(final_frame[metric], final_frame.loc[row, metric])/100
+            except: 
+                final_frame.loc[row, metrics[metric]] = np.nan
+
+    # metrics where we have to invert the percentile
     inv_metrics = {
-            'returnOnEquity' : "ROE_percentile",
-            'FF_Quality_Growth' : "FFQ_growth_percentile",
-            "FF_Quality_actual": "FFQ_actual_percentile"
+            'returnOnEquity' : "ROE(inv)_percentile",
+            'FF_Quality_Growth' : "FFQ(inv)_g_percentile",
+            "FF_Quality_actual": "FFQ(inv)_a_percentile",
+            'FF_Quality_mean' : 'FFQ(inv)_m_percentile',
             }
 
     for row in final_frame.index:
         for metric in inv_metrics.keys():
-            final_frame.loc[row, inv_metrics[metric]] = 1-(stats.percentileofscore(final_frame[metric], final_frame.loc[row, metric])/100)
+            try:
+                final_frame.loc[row, inv_metrics[metric]] = 1-(stats.percentileofscore(final_frame[metric], final_frame.loc[row, metric])/100)
+            except:
+                final_frame.loc[row, inv_metrics[metric]] = np.nan
     
     return(final_frame)
+
+
+
+def clean_stock_selection(stocks):
+    return(stocks[stocks.industry != "Finanzdienstleistungen"])
+
+def save_data(sample, path):
+    sample.to_pickle(path)
+
+
+stockinfo_pkl = pd.read_pickle( BLD / "data" / "val_eurostoxx600.pkl")
+today = datetime.today().strftime("%Y-%m-%d")
+@pytask.mark.produces(SRC / "data_management" / f"proc_eurostoxx600_{today}.pkl")
+def task_process_eu_stocks(produces):
+
+    stockinfo_pkl = pd.read_pickle( BLD / "data" / "val_eurostoxx600_stocks.pkl")   
+    stocklist =  clean_stock_selection(stockinfo_pkl)
+    frame = pd.DataFrame({})
+    with ThreadPool() as p:
+        frame = frame.append(p.map(get_data , stocklist.ticker[1:5]))
+        p.close()
+    final_frame = calc_precentiles(frame)
+    save_data(final_frame, produces)
+
+
+def fun_process_stocks(stockinfo_pkl, datalist):
+
+    stocklist =  clean_stock_selection(stockinfo_pkl)
+    frame = pd.DataFrame({})
+    with ThreadPool() as p:
+        frame = frame.append(p.map(get_data , stocklist.ticker[1:10]))
+        p.close()
+    final_frame = calc_precentiles(frame)
+    save_data(final_frame, SRC / "data_management" / "processed_data" / f"proc_{today}_{datalist}")
+
+
+if __name__ == "__main__":
     
+    today = datetime.today().strftime("%Y-%m-%d")
+    data_ls = ["val_eurostoxx600.pkl",
+               "val_de.pkl",
+               "val_nyse.pkl",]
+    for datalist in data_ls:
+        stockinfo_pkl = pd.read_pickle( BLD / "data" / datalist)  
+        fun_process_stocks(stockinfo_pkl, datalist)
