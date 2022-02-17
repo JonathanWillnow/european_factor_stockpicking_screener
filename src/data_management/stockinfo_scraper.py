@@ -181,3 +181,112 @@ def get_ticker(initial_frame):
     time.sleep(1)
     browser.quit()
     return frame
+
+
+
+def validate_ticker(path):
+
+    """
+    Function to update the stock information for the different exchanges / indicies
+    This function is usefull to:
+        - check if info is up to date
+        - after adding new stocks to the {exchange / index}Stocks.csv files
+        - to check that scraping was not corruped by bad internet connection or other issues
+        - to validate the scraping
+    
+    Inputs:
+        path (str): path of the file for which to perform the validation
+
+    """
+    url_ticker = "https://www.finanznachrichten.de/"
+    url_yf_ticker = "https://finance.yahoo.com/quote/FB?p=FB"
+    # browser =  webdriver.Firefox(executable_path='/home/jonathan/Schreibtisch/geckodriver')
+    # extension_path = r"/home/jonathan/.mozilla/firefox/5xapxbqn.default-release/extensions/jid1-MnnxcxisBPnSXQ@jetpack.xpi"
+    # browser.install_addon(extension_path, temporary=True)
+
+
+    browser =  webdriver.Firefox()
+    extension_path = r"C:\Users\Jonathan\AppData\Roaming\Mozilla\Firefox\Profiles\wl4weym2.default-1633941918487\extensions\jid1-MnnxcxisBPnSXQ@jetpack.xpi"
+    browser.install_addon(extension_path, temporary=True)
+    time.sleep(2)
+    #extension_path = r"C:\Users\Jonathan\AppData\Roaming\Mozilla\Firefox\Profiles\wl4weym2.default-1633941918487\extensions\firefox-webext@zenmate.com.xpi"
+    #browser.install_addon(extension_path, temporary=True)
+    browser.maximize_window()
+    browser.get("about:support")
+    time.sleep(5)
+    browser.get(url_ticker)
+    time.sleep(5)
+    file = pd.read_csv(path, encoding='utf-8')
+    for i, row in file.iterrows():
+        if (row.ISIN) == "not_found" and (row.wkn != "-"):
+            print(file.loc[i, "name"])
+            try:
+                time.sleep(1)
+                clear = WebDriverWait(browser, 25).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#fnk-suche-eingabe"))).clear()
+                time.sleep(random.randint(3,4))
+                search = WebDriverWait(browser, 25).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#fnk-suche-eingabe")))
+                time.sleep(random.randint(2,3))
+                search.send_keys(str(row.wkn))
+                time.sleep(3)
+                browser.find_element_by_css_selector('#suchhilfeListe > tbody:nth-child(2) > tr:nth-child(3) > td:nth-child(2)').click()
+                time.sleep(random.randint(2,3))
+                file.at[i, "de_ticker"] = (WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#produkt-ticker"))).text.replace("Ticker-Symbol: ", "").lstrip())
+                #time.sleep(2)
+            except:
+                pass
+            try:
+                if file.at[i, "industry"] == "not_found":
+                    file.at[i, "industry"] = (WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".a > a:nth-child(2)"))).text)
+                    time.sleep(3)
+            except:
+                pass
+            try:
+                if file.at[i, "ISIN"] == "not_found":
+                    file.at[i, "ISIN"] = (WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#produkt-isin"))).text.replace("ISIN: ", "").lstrip())
+                    time.sleep(random.randint(2,3))
+            except:
+                pass
+
+    time.sleep(3)
+    browser.get(url_yf_ticker)
+    time.sleep(3)
+    try:
+        browser.find_element_by_css_selector("#scroll-down-btn").click()
+        time.sleep(3)
+    except:
+        pass
+    try:
+        browser.find_element_by_css_selector("button.btn:nth-child(5)").click()
+        time.sleep(4)
+    except:
+        pass
+    for i, row in file.iterrows():
+        if row.ISIN == "not_found":
+            continue
+        if file.at[i, "ticker"] == "not_found":
+            time.sleep(random.randint(1,2))
+            try:
+                browser.find_element_by_css_selector("#scroll-down-btn").click()
+                time.sleep(3)
+            except:
+                pass
+            try:
+                browser.find_element_by_css_selector("button.btn:nth-child(5)").click()
+                time.sleep(4)
+            except:
+                pass
+
+            clear = WebDriverWait(browser, 25).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#yfin-usr-qry"))).clear()
+            time.sleep(random.randint(3,5))
+            try:
+                search = WebDriverWait(browser, 25).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#yfin-usr-qry")))
+                time.sleep(1)
+                search.send_keys(str(row.ISIN))
+                time.sleep(5)
+                file.at[i, "ticker"] = (WebDriverWait(browser, 25).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#result-quotes-0 > div.modules_quoteLeftCol__gkCSv.modules_Ell__77DLP.modules_IbBox__2pmLe > div.modules_quoteSymbol__hpPcM.modules_Ell__77DLP.modules_IbBox__2pmLe"))).text)
+            except:
+                pass
+    #exchange = file.index[0]
+    file.to_csv("val_" + path) 
+
+    browser.quit()
