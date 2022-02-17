@@ -7,7 +7,6 @@ import pandas as pd
 from scipy import stats #The SciPy stats module
 from multiprocessing.pool import ThreadPool
 import pytask
-from src.config import BLD
 from src.config import SRC
 #from src.data_management.stockinfo_scraper import get_stock_data
 
@@ -215,12 +214,12 @@ def save_data(sample, path):
     sample.to_pickle(path)
 
 
-stockinfo_pkl = pd.read_pickle( BLD / "data" / "val_eurostoxx600.pkl")
+stockinfo_pkl = pd.read_pickle( SRC / "data_management" / "data" / "val_eurostoxx600.pkl")
 today = datetime.today().strftime("%Y-%m-%d")
 @pytask.mark.produces(SRC / "data_management" / f"proc_eurostoxx600_{today}.pkl")
 def task_process_eu_stocks(produces):
 
-    stockinfo_pkl = pd.read_pickle( BLD / "data" / "val_eurostoxx600_stocks.pkl")   
+    stockinfo_pkl = pd.read_pickle( SRC / "data_management" / "data" / "val_eurostoxx600_stocks.pkl")   
     stocklist =  clean_stock_selection(stockinfo_pkl)
     frame = pd.DataFrame({})
     with ThreadPool() as p:
@@ -248,5 +247,5 @@ if __name__ == "__main__":
                "val_de.pkl",
                "val_nyse.pkl",]
     for datalist in data_ls:
-        stockinfo_pkl = pd.read_pickle( BLD / "data" / datalist)  
+        stockinfo_pkl = pd.read_pickle( SRC / "data_management" / "data" / datalist)  
         fun_process_stocks(stockinfo_pkl, datalist)
