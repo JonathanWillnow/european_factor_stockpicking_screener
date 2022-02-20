@@ -53,4 +53,5 @@ dependencies:
     - intrinio_sdk
     - pandas_datareader
     - multiprocessing
-
+    - flask
+    - dash
