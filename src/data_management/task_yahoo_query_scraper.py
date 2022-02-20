@@ -13,6 +13,7 @@ from src.config import SRC
 
 
 def get_data(stockticker):
+    stock = None
 
     metrics_list = ['enterpriseValue', "marketCap",'forwardPE', "trailingPE", 'profitMargins', 'floatShares', "sharesOutstanding", 
                     'priceToBook', 'heldPercentInsiders', 'bookValue', 'priceToSalesTrailing12Months', 'trailingEps', 'forwardEps',
@@ -23,12 +24,11 @@ def get_data(stockticker):
 
     check_list = ['forwardPE', "trailingPE", "marketCap", 'priceToSalesTrailing12Months', "dividendYield"]
 
-    Fame_French_Quality = ["totalRevenue", "costOfRevenue", "grossProfit", "sellingGeneralAdministrative", "interestExpense", "operatingIncome", "netIncomeFromContinuingOps"]
-    
     #get exchange
     #countrycode = stockinfo.ISIN[stockinfo.ticker == stockticker].values[0][:2]
    
     stock = str(stockticker) #+ ".F"
+    print(stock)
     data_dict = {}
     data_dict["ticker"] = stock
     data_dict["date"] = datetime.today().strftime("%Y-%m-%d")
@@ -67,14 +67,15 @@ def get_data(stockticker):
             data_dict[metric] = np.nan
 
     for metric in check_list:
-        if np.isnan(data_dict[metric]):
-            try:
-                query_url_3 = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/"+str(stock)+"?modules=summaryDetail"
-                with urllib.request.urlopen(query_url_3) as url:
-                        parsed_3 = json.loads(url.read().decode())
-                data_dict[metric] = parsed_3["quoteSummary"]["result"][0]["summaryDetail"][metric]["raw"]
-            except:
-                pass
+        
+        try:
+            query_url_3 = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/"+str(stock)+"?modules=summaryDetail"
+            with urllib.request.urlopen(query_url_3) as url:
+                    parsed_3 = json.loads(url.read().decode())
+            data_dict[metric] = parsed_3["quoteSummary"]["result"][0]["summaryDetail"][metric]["raw"]
+        except:
+            pass
+    
     ## FF Quality
     FF_Quality_year_frame = calculate_FF_Quality(stock)
     # Calculate Growth rates and report recent and mean FF_Quality Factor
@@ -208,19 +209,20 @@ def calc_precentiles(final_frame):
 
 
 def clean_stock_selection(stocks):
-    return(stocks[stocks.industry != "Finanzdienstleistungen"])
+    return(stocks[stocks.industry != "not_found"])
+    #return(clean_stocks[clean.industry != "Finanzdienstleistungen"])
 
 def save_data(sample, path):
     sample.to_pickle(path)
 
 
-stockinfo_pkl = pd.read_pickle( SRC / "data_management" / "data" / "val_eurostoxx600.pkl")
+stockinfo_pkl_task = pd.read_pickle( SRC / "data_management" / "data" / "val2_euro600.pkl")
 today = datetime.today().strftime("%Y-%m-%d")
 @pytask.mark.produces(SRC / "data_management" / f"proc_eurostoxx600_{today}.pkl")
 def task_process_eu_stocks(produces):
 
     stockinfo_pkl = pd.read_pickle( SRC / "data_management" / "data" / "val_eurostoxx600_stocks.pkl")   
-    stocklist =  clean_stock_selection(stockinfo_pkl)
+    stocklist =  clean_stock_selection(stockinfo_pkl_task)
     frame = pd.DataFrame({})
     with ThreadPool() as p:
         frame = frame.append(p.map(get_data , stocklist.ticker[1:5]))
@@ -232,20 +234,29 @@ def task_process_eu_stocks(produces):
 def fun_process_stocks(stockinfo_pkl, datalist):
 
     stocklist =  clean_stock_selection(stockinfo_pkl)
+    try:
+        stocklist.drop('Unnamed: 0', axis=1, inplace=True)
+    except:
+        pass
     frame = pd.DataFrame({})
     with ThreadPool() as p:
-        frame = frame.append(p.map(get_data , stocklist.ticker[1:10]))
+        frame = frame.append(p.map(get_data, stocklist.ticker))
         p.close()
     final_frame = calc_precentiles(frame)
     save_data(final_frame, SRC / "data_management" / "processed_data" / f"proc_{today}_{datalist}")
 
-
+import warnings
+warnings.filterwarnings("ignore")
 if __name__ == "__main__":
     
     today = datetime.today().strftime("%Y-%m-%d")
-    data_ls = ["val_eurostoxx600.pkl",
-               "val_de.pkl",
-               "val_nyse.pkl",]
+    data_ls = ["val2_de.pkl",
+               "val2_euro600.pkl",
+               "val2_nyse.pkl",
+               "val2_nasdaq.pkl",
+               "val2_nikkei225.pkl",
+               "val2_amex.pkl"]
     for datalist in data_ls:
         stockinfo_pkl = pd.read_pickle( SRC / "data_management" / "data" / datalist)  
         fun_process_stocks(stockinfo_pkl, datalist)
+        time.sleep(1)
