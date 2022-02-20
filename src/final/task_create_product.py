@@ -78,7 +78,7 @@ if __name__ == "__main__":
                ]
     for datalist in data_ls:
 
-        rv_dataframe = pd.read_pickle( SRC / "data_management" / "processed_data" / datalist) 
+        rv_dataframe = pd.read_pickle( SRC / "final" / "processed_data" / datalist) 
         try:
             rv_dataframe.drop("Unnamed: 0", axis=1, inplace=True)
         except:
@@ -116,5 +116,5 @@ if __name__ == "__main__":
             ]
         ]
          
-        sorted_rc_frame.to_pickle(SRC / "data_management" / "processed_data" /f"f_{datalist}")
+        sorted_rc_frame.to_pickle(SRC / "final" / "processed_data" /f"f_{datalist}")
         time.sleep(1)

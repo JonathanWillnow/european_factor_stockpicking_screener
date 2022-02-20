@@ -243,7 +243,7 @@ def fun_process_stocks(stockinfo_pkl, datalist):
         frame = frame.append(p.map(get_data, stocklist.ticker))
         p.close()
     final_frame = calc_precentiles(frame)
-    save_data(final_frame, SRC / "data_management" / "processed_data" / f"proc_{today}_{datalist}")
+    save_data(final_frame, SRC / "final" / "processed_data" / f"proc_{today}_{datalist}")
 
 import warnings
 warnings.filterwarnings("ignore")
