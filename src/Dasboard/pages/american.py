@@ -24,10 +24,10 @@ data_american.sort_values("ticker", inplace=True)
 
 layout = html.Div(
     children=[
-        html.H1(children="European Stocks",
+        html.H1(children="American Stocks",
         className="header-title"),
         html.P(
-            children="Browse through the european Stocks",
+            children="Browse through the american stocks, selected from AMEX, NYSE and NASDAQ",
             className="header-description",
         ),
         dcc.Graph(
@@ -78,7 +78,7 @@ layout = html.Div(
                    'overflowX': 'scroll'},
            # className='six columns'
         ),
-        html.H3(children="Avocado Analytics",
+        html.H3(children="Further Analysis on selected metrics",
         style={'textAlign': 'center'}),
         html.Div(
             id='table-paging-with-graph-container-american',
@@ -234,38 +234,6 @@ def display_click_data(active_cell, table_data):
                 
             ))
 
-START_DATE = '2019-01-01'
-END_DATE = '2020-12-31'
-
-from pandas_datareader.famafrench import get_available_datasets
-import pandas_datareader.data as web
-import pandas as pd
-ff_dict = web.DataReader('F-F_Research_Data_Factors', 'famafrench', start=START_DATE, end = END_DATE) # default is monthly  #ff_dict.keys()  #print(ff_dict["DESCR"])
-factor_df = ff_dict[0]#monthly factors. 1 for annual
-factor_df.rename(columns = {"Mkt-RF": "mkt_rf", "SMB":"smb", "HML":"hml", "RF":"rf"}, inplace= True) 
-factor_df["mkt"] = factor_df.mkt_rf + factor_df.rf
-factor_df = factor_df.apply(pd.to_numeric, errors='coerce').div(100)
-
-
-# start='2000-01-01',
-# end='2021-12-31',
-
-
-
-
-# from pandas_datareader.famafrench import get_available_datasets
-# import pandas_datareader.data as web
-# ff_dict = web.DataReader('F-F_Research_Data_Factors', 'famafrench', start=start, end=end) # default is monthly  #ff_dict.keys()  #print(ff_dict["DESCR"])
-# factor_df = ff_dict[0]#monthly factors. 1 for annual
-# factor_df.rename(columns = {"Mkt-RF": "mkt_rf", "SMB":"smb", "HML":"hml", "RF":"rf"}, inplace= True) 
-# factor_df["mkt"] = factor_df.mkt_rf + factor_df.rf
-# factor_df = factor_df.apply(pd.to_numeric, errors='coerce').div(100)
-
-
-
-
-# Some stuff to play arroudn for now
-
 def realized_volatility(x):
     return np.sqrt(np.sum(x**2))
     
@@ -302,11 +270,17 @@ def indentify_outliers(row, n_sigmas=3):
     else:
         return 0
 
-def plot_stock(df):
-    fig, ax = plt.subplots(3, 1, figsize=(24, 20))#sharex=True)
-    ax[0].plot(df.adj_close)
-    ax[0].set(xlabel = 'Date',title = 'MSFT time series', ylabel = 'Stock price ($)')
-    ax[1].plot(df.simple_rtn, linestyle='solid')
-    ax[1].set(xlabel = 'Date', ylabel = 'Simple returns (%)')
-    ax[2].plot(df.log_rtn)
-    ax[2].set(xlabel = 'Date', ylabel = 'Log returns (%)')
+
+START_DATE = '2019-01-01'
+END_DATE = '2020-12-31'
+
+from pandas_datareader.famafrench import get_available_datasets
+import pandas_datareader.data as web
+import pandas as pd
+ff_dict = web.DataReader('F-F_Research_Data_Factors', 'famafrench', start=START_DATE, end = END_DATE) # default is monthly  #ff_dict.keys()  #print(ff_dict["DESCR"])
+factor_df = ff_dict[0]#monthly factors. 1 for annual
+factor_df.rename(columns = {"Mkt-RF": "mkt_rf", "SMB":"smb", "HML":"hml", "RF":"rf"}, inplace= True) 
+factor_df["mkt"] = factor_df.mkt_rf + factor_df.rf
+factor_df = factor_df.apply(pd.to_numeric, errors='coerce').div(100)
+
+# Some stuff to play arroudn for now
