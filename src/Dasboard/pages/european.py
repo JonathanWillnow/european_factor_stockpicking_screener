@@ -1,16 +1,21 @@
 import dash
 from dash import dcc, html
 import pandas as pd
+import json
 import numpy as np
 import dash_bootstrap_components as dbc
-from dash.dependencies import Output, Input
+from dash.dependencies import Output, Input, State
 from src.config import SRC
 
-data_input_eu = pd.read_pickle(SRC / "final" / "processed_data" / "f_proc_2022-02-19_val2_euro600.pkl")
+import yfinance as yf
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-#data = data2[["ticker", "marketCap", "forwardPE",  "EV_percentile", "FFQ(inv)_a_percentile", "trailingPE","profitMargins","floatShares"]]
-data = round(data_input_eu, 3)
-data.sort_values("ticker", inplace=True)
+from pages.functions import *
+
+data_input_eu = round(pd.read_pickle(SRC / "final" / "processed_data" / "f_proc_2022-02-19_val2_euro600.pkl"),3)
+data = reorder_naming(data_input_eu)#.sort_values("ticker", inplace=True)
+
 
 
 layout = html.Div(
@@ -26,30 +31,31 @@ layout = html.Div(
                 "data": [
                     {
                         "x": data["ticker"],
-                        "y": data["marketCap"],
+                        "y": data["MC"],
                         "type": "lines",
                     },
                 ],
                 "layout": {"title": "Average Price of Avocados"},
             },
         ),
-        dcc.Graph(
-            figure={
-                "data": [
-                    {
-                        "x": data["ticker"],
-                        "y": data["forwardPE"],
-                        "type": "lines",
-                    },
-                ],
-                "layout": {"title": "Avocados Sold"},
-            },
-        ),
+        html.Div(id="click-data-eu", style={"whiteSpace": "pre-wrap"}),
+        # dcc.Graph(
+        #     figure={
+        #         "data": [
+        #             {
+        #                 "x": data["ticker"],
+        #                 "y": data["forwardPE"],
+        #                 "type": "lines",
+        #             },
+        #         ],
+        #         "layout": {"title": "Avocados Sold"},
+        #     },
+        # ),
          html.Div(
             dash.dash_table.DataTable(
-                id='table-paging-with-graph',
+                id='table-paging-with-graph-eu',
                 columns=[
-                    {"name": i, "id": i} for i in sorted(data.columns)
+                    {"name": i, "id": i} for i in data.columns
                 ],
                 page_current=0,
                 page_size=20,
@@ -62,15 +68,15 @@ layout = html.Div(
                 sort_mode='multi',
                 sort_by=[]
             ),
-            style={'height': 700,
+            style={'height': 750,
                    'overflowY': 'scroll',
                    'overflowX': 'scroll'},
            # className='six columns'
         ),
-        html.H3(children="Avocado Analytics",
+        html.H3(children="Further Analysis on selected metrics.",
         style={'textAlign': 'center'}),
         html.Div(
-            id='table-paging-with-graph-container',
+            id='table-paging-with-graph-container-eu',
             className="five columns",
 
             style={"margin-top": "25px"},
@@ -115,11 +121,11 @@ def split_filter_part(filter_part):
 
 
 @dash.callback(
-    Output('table-paging-with-graph', "data"),
-    Input('table-paging-with-graph', "page_current"),
-    Input('table-paging-with-graph', "page_size"),
-    Input('table-paging-with-graph', "sort_by"),
-    Input('table-paging-with-graph', "filter_query"))
+    Output('table-paging-with-graph-eu', "data"),
+    Input('table-paging-with-graph-eu', "page_current"),
+    Input('table-paging-with-graph-eu', "page_size"),
+    Input('table-paging-with-graph-eu', "sort_by"),
+    Input('table-paging-with-graph-eu', "filter_query"))
 def update_table(page_current, page_size, sort_by, filter):
     filtering_expressions = filter.split(' && ')
     dff = data
@@ -152,8 +158,8 @@ def update_table(page_current, page_size, sort_by, filter):
 
 
 @dash.callback(
-    Output('table-paging-with-graph-container', "children"),
-    Input('table-paging-with-graph', "data"))
+    Output('table-paging-with-graph-container-eu', "children"),
+    Input('table-paging-with-graph-eu', "data"))
 def update_graph(rows):
     dff = pd.DataFrame(rows)
     return html.Div(
@@ -179,7 +185,56 @@ def update_graph(rows):
                 },
                 
             )
-            for column in ["marketCap", "forwardPE",  "EV_percentile", "FFQ(inv)_a_percentile"]
+            for column in [
+                "Score",
+                "P/B",
+                "FFA",
+                "FFQ",
+                "d FFQ",
+                "ROE",
+                "ROA",
+            ]
         ]
+    )
+
+
+# define callback
+@dash.callback(
+    Output("click-data-eu", "children"),
+    [Input("table-paging-with-graph-eu", "active_cell")],
+    # (A) pass table as data input to get current value from active cell "coordinates"
+    [State("table-paging-with-graph-eu", "data")],
+)
+def display_click_data(active_cell, table_data):
+    if active_cell:
+        cell = json.dumps(active_cell, indent=2)
+        row = active_cell["row"]
+        col = active_cell["column_id"]
+        value = table_data[row]["ticker"]
+        # out = '%s\n%s' % (cell, value)
+    else:
+        return
+        # out = 'no cell selected'
+    dff = get_data_d(value)
+    return html.Div(
+        dcc.Graph(
+            figure={
+                "data": [
+                    {
+                        "x": dff.index,
+                        "y": dff["adj_close"],
+                        "type": "lines",
+                        "marker": {"color": "#0074D9"},
+                    }
+                ],
+                "layout": {
+                    "xaxis": {"automargin": True},
+                    "yaxis": {"automargin": True},
+                    "height": 400,
+                    "title": f"Chart for {value}",
+                    "margin": {"t": 35, "l": 10, "r": 10},
+                },
+            },
+        )
     )
 
