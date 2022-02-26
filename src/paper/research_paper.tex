@@ -77,34 +77,32 @@
 
 
 \begin{abstract}
-    Some abstract here.
+    The focus of this project is to build an interactive tool that helps individual investors in their buying decisions of individual stock. 
+    The project tackles several aspects to lead to betetr ibnformed decisions: First, I deliberately omit the names of the stocks and report only the ticker symbol.
+    This should help individuals to not bias themselves when tehy see an popular or unpopular stock since the decision should be purely based on the fundamentals.
+    Secondly, apart from reporting standart metrics, I calculate the empirically proven Fama French Asset Pricing Factors. Thirdly, I come up with an on Score to score the stocks
+    with respect to the asset pricing factors and reported metrics. This Score is not an ultimatively assasement since it does not capture all neccessary informations, 
+    but investors can use it to get a first insight into a stock.
+    This project is based on sraped stocks for Germany, Europe, North-America and Japan and collects the metrics used for assesment and calculation of the facotrs
+    from finance.yahoo.com. The long term plan is to automate this project such that it serves as a reliable, automated way to screen stocks and improve stockpicking decisions.
 \end{abstract}
 \clearpage
 
 \section{Introduction} % (fold)
 \label{sec:introduction}
 
-If you are using this template, please cite this item from the references: \citet{GaudeckerEconProjectTemplates}
-
-\citet{Schelling69} example in the code is taken from \citet{StachurskiSargent13}
-
-The decision rule of an agent is the following:
-\input{formulas/decision_rule}
-
-\begin{figure}
-    \caption{Segregation by cycle in the baseline \citet{Schelling69} model as in the \citet{StachurskiSargent13} example}
-
-    \includegraphics[width=\textwidth]{../../bld/figures/schelling_baseline}
-
-\end{figure}
+Stock market participation increased in the last years. While this is overall a positive develoment, many investors lack tools to base their investments on or are solely using their
+gut feeling. While there are lots of tools available, I could not find a free tool that allows a comparison of stocks based on the Fama French Asset Pricing Factors - so I 
+decided to build it myself. As this is work in progress, it is not available right now for the broad audience, but I shared the developed Dashboard with a big german speaking 
+stock picking community, called "Kleine Finanzzeitung".
 
 
-\begin{figure}
-    \caption{Segregation by cycle in the baseline \citet{Schelling69} model, limiting the number of potential moves per period to two}
 
-    \includegraphics[width=\textwidth]{../../bld/figures/schelling_max_moves_2}
+\section{Methodology}
 
-\end{figure}
+\section{Code}
+As this project was part of the course Effective Programming Practices for Economists by Prof. von Gaudecker, the corresponding repository 
+that is available on github follows \citet{GaudeckerEconProjectTemplates}.
 
 % section introduction (end)
 
