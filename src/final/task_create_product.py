@@ -19,11 +19,11 @@ def save_data(sample, path):
 
 today = datetime.today().strftime("%Y-%m-%d")
 
+@pytask.mark.depends_on(SRC / "final" / f"proc_eurostoxx600_{today}.pkl")
+@pytask.mark.produces(SRC / "product_data" / f"f_proc_eurostoxx600_{today}.pkl")
+def task_create_product(depends_on, produces):
 
-@pytask.mark.produces(SRC / "product_data" / f"NYSE_product.csv{today}")
-def task_create_product(produces):
-
-    rv_dataframe = pd.read_csv(r"src\final\processed_NYSEStocks_2022-02-01.csv")#
+    rv_dataframe = pd.read_pickle(depends_on)
     try:
         rv_dataframe.drop("Unnamed: 0", axis=1, inplace=True)
     except:

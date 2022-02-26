@@ -216,13 +216,13 @@ def save_data(sample, path):
     sample.to_pickle(path)
 
 
-stockinfo_pkl_task = pd.read_pickle( SRC / "data_management" / "data" / "val2_euro600.pkl")
-today = datetime.today().strftime("%Y-%m-%d")
-@pytask.mark.produces(SRC / "data_management" / f"proc_eurostoxx600_{today}.pkl")
-def task_process_eu_stocks(produces):
 
-    stockinfo_pkl = pd.read_pickle( SRC / "data_management" / "data" / "val_eurostoxx600_stocks.pkl")   
-    stocklist =  clean_stock_selection(stockinfo_pkl_task)
+today = datetime.today().strftime("%Y-%m-%d")
+@pytask.mark.depends_on(SRC / "original_data" / "val2_euro600.pkl")
+@pytask.mark.produces(SRC / "final" / f"proc_eurostoxx600_{today}.pkl")
+def task_process_eu_stocks(depends_on, produces):
+
+    stocklist =  clean_stock_selection(pd.read_pickle(depends_on))
     frame = pd.DataFrame({})
     with ThreadPool() as p:
         frame = frame.append(p.map(get_data , stocklist.ticker[1:5]))
@@ -257,6 +257,6 @@ if __name__ == "__main__":
                "val2_nikkei225.pkl",
                "val2_amex.pkl"]
     for datalist in data_ls:
-        stockinfo_pkl = pd.read_pickle( SRC / "data_management" / "data" / datalist)  
+        stockinfo_pkl = pd.read_pickle( SRC / "original_data" / datalist)  
         fun_process_stocks(stockinfo_pkl, datalist)
         time.sleep(1)

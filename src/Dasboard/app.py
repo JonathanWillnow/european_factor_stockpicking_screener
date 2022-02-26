@@ -1,15 +1,10 @@
-# Code source: https://dash-bootstrap-components.opensource.faculty.ai/examples/simple-sidebar/
 import dash
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 import plotly.express as px
 from dash.dependencies import Input, Output
 import pandas as pd
-from pages import landing_page, european, german, american, japanese, documentation
-
-# data source: https://www.kaggle.com/chubak/iranian-students-from-1968-to-2017
-# data owner: Chubak Bidpaa
-#df = pd.read_csv('https://raw.githubusercontent.com/Coding-with-Adam/Dash-by-Plotly/master/Bootstrap/Side-Bar/iranian_students.csv')
+from pages import landing_page, european, german, american, japanese, documentation, impressum
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX])
 
@@ -47,7 +42,7 @@ sidebar = html.Div(
                 dbc.NavLink("USA Factors", href="/american", active="exact"),
                 dbc.NavLink("Japan Factors", href="/japanese", active="exact"),
                 dbc.NavLink("Documentation", href="/documentation", active="exact"),
-               # dbc.NavLink("Impressum", href="/impressum", active="exact"),
+                dbc.NavLink("Impressum", href="/impressum", active="exact"),
             ],
             vertical=True,
             pills=True,
@@ -80,7 +75,7 @@ def render_page_content(pathname):
         return japanese.layout
     elif pathname == "/documentation":
         return documentation.layout
-    elif pathname == "impressum":
+    elif pathname == "/impressum":
         return impressum.layout
     elif pathname == "/german":
         return german.layout    
