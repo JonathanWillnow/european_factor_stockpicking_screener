@@ -14,6 +14,7 @@
 \usepackage{xfrac}
 \usepackage{setspace}
 \usepackage{xcolor}
+\usepackage{url} 
 \usepackage{subcaption}
 \usepackage{minibox}
 % \usepackage{pdf14} % Enable for Manuscriptcentral -- can't handle pdf 1.5
@@ -90,19 +91,41 @@
 
 \section{Introduction} % (fold)
 \label{sec:introduction}
-
 Stock market participation increased in the last years. While this is overall a positive develoment, many investors lack tools to base their investments on or are solely using their
 gut feeling. While there are lots of tools available, I could not find a free tool that allows a comparison of stocks based on the Fama French Asset Pricing Factors - so I 
-decided to build it myself. As this is work in progress, it is not available right now for the broad audience, but I shared the developed Dashboard with a big german speaking 
-stock picking community, called "Kleine Finanzzeitung".
+decided to build it myself. As this is work in progress, it is not available right now for the broad audience, but I shared the results in a developed Dash-App with a big german speaking 
+stock picking community, called "Kleine Finanzzeitung". This allows users to access my results and my research without having a proper background in programming and git.
+The Dash-App can be found here: \url{https://stockpickingapp.herokuapp.com}
 
 
 
 \section{Methodology}
+The idea apperas simple: There exist more than only one risk factor $r_f$,  that determines the
+performance of a portfolio (here, portfolio is assumed to be a index/ market portfolio).
+ama and French came up with the Fama and French three factor model that includes
+the size of firms, their book-to-market values, and their excess return on the market. In other words, 
+the three factors used are $SMB$ (small minus big), $HML$ (high minus low), and $r_f$, the
+market return return less the risk-free rate of return. Building up on their work, many other
+factors have been researched and found like the Fama French Quality Factor and Conservative 
+Asset factor or the Carhartd Momentum Factor. While the Momentum Factor finds strong 
+empirical support like the other factors, this project sofar is limited to the factors 
+found by Fama and French. 
+A selection of individual Stocks is available for Europe, Germany, Japan and North America
+that was collected using several scrapers and validation mehtods. To obtain reliable metrics
+the metrics are collected from https://finance.yahoo.com
+using the functionality of the python packe urllib.requests. The so obtained metrics were then 
+used to compute the introduced factors according to the work of Fama and French. To present the 
+results and allow for easy filtering, I decided to deploy this simple Dash App.
+
 
 \section{Code}
 As this project was part of the course Effective Programming Practices for Economists by Prof. von Gaudecker, the corresponding repository 
-that is available on github follows \citet{GaudeckerEconProjectTemplates}.
+that is available on github follows \citet{GaudeckerEconProjectTemplates}. The code for this repo can be found on \url{https://github.com/JonathanWillnow/european_factor_stockpicking_screener}
+
+\section{How to run the code}
+Please refer to the README.md file for how to run the project and its tasks.
+
+\section{Further Development and Outlook}
 
 % section introduction (end)
 
