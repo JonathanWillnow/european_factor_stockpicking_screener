@@ -1,5 +1,6 @@
 """
-This code is cleaning up the collected data and builds the final dataset which is then used for the stockscreening
+This code is cleaning up the collected data and builds the final dataset which is then used for the stockscreening on https://stockpickingapp.herokuapp.com.
+I tried to limit the cleaning in this step as much as possible since there is more filtering possible on https://stockpickingapp.herokuapp.com.
 
 """
 
@@ -33,7 +34,7 @@ today = datetime.today().strftime("%Y-%m-%d")
 @pytask.mark.produces(SRC / "product_data" / f"f_proc_eurostoxx600_{today}.pkl")
 def task_create_product(depends_on, produces):
     """
-    Pytask function to create the european product.
+    Pytask function to create the european product. The output can be found in src.product_data.
     
     """
 
@@ -46,7 +47,6 @@ def task_create_product(depends_on, produces):
             'marketCap': 'MC_percentile',
             'priceToBook':'PB_percentile',
             'FF_Quality_mean' : 'FFQ(inv)_m_percentile',
-            #'FF_Quality_Growth' : 'FFQ(inv)_g_percentile',
             'FF_Assets_Growth_mean': 'FFA_m_percentile',
         }
 

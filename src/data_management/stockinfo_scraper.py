@@ -1,5 +1,8 @@
 """
-    Several functions that manually triggered to obtain the info about stocks of a specific exchange / index. 
+    Several functions that obtain the info about stocks of a specific exchange / index. 
+    Currently this has to be done manually since it uses Selenium and BeautifoulSoup, which tend to be a bit unstable. 
+    From time to time it can happen that the scraper runs into a problem and the user then has to fix it by hand (for isntance closing an advertisement window which is randomly triggered and is not detected by Selenium).
+
 """
 
 import urllib.request, json , time, os, difflib, itertools
@@ -32,7 +35,7 @@ def get_stock_data(url, index_exchange):
           (e.g.: Nasdaq, Amex, NYSE, ...).
     
     Returns:
-        - FRAME, a pd.DataFrame containing the name, wkn, and index / exchange of stocks.
+        - A pd.DataFrame containing the name, wkn, and index / exchange of stocks.
     """
     browser =  webdriver.Firefox()
     time.sleep(2)
@@ -79,7 +82,7 @@ def get_ticker(initial_frame):
         - initial_frame(pd.DataFrame): A pd.DataFrame contating the wkn and name of the stocks
 
     Returns:
-        - frame, a pd.DataFrame with all the collected information.
+        - A pd.DataFrame with all the collected information.
 
     """
 

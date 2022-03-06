@@ -1,9 +1,9 @@
 """
-This code is used for collecting and calculating all the metrics wich will be used for https://stockpickingapp.herokuapp.com.
+This code is the core of this project. It is used for collecting and calculating all the metrics wich will be used for https://stockpickingapp.herokuapp.com.
+It is planned to collect the metrics of the stocks every week, or every 2 weeks. In a future version and once enough weekly or two-weekly period data is collected,
+the Dash-App shall also incorporate this historic metrics.
 
 """
-
-from unicodedata import name
 import urllib.request, json , time, os, difflib, itertools
 from datetime import datetime
 import time
@@ -178,7 +178,7 @@ def calculate_FF_Quality(stock):
 def calculate_FF_CA(stock):
     """
     Function to calculate the Fama French Conservative Asset Factor.
-    The Conservative Asset Factor is defined as the ratio of total assets of a stock at the fiscal year end of t−1 and the total assets at fiscal year end of t−2.
+    The Conservative Asset Factor is defined as the ratio of total assets of a stock at the fiscal year end of t-1  and the total assets at fiscal year end of t-2.
     For more informations, refer to Fama and French (2015).
 
     Inputs:
@@ -278,6 +278,15 @@ today = datetime.today().strftime("%Y-%m-%d")
 @pytask.mark.depends_on(SRC / "original_data" / "val2_euro600.pkl")
 @pytask.mark.produces(SRC / "final" / f"proc_eurostoxx600_{today}.pkl")
 def task_process_eu_stocks(depends_on, produces):
+    """
+    Pytask function to collect the metrics for all the atocks of the EuroStoxx600 index.
+
+    Inputs:
+        - depends_on(): A pickle file containing all the information that is needed to obtain the metrics.
+    Returns:
+        - produces(): A pickle file containing all the collected indormations and metrics.
+
+    """ 
 
     stocklist =  clean_stock_selection(pd.read_pickle(depends_on))
     frame = pd.DataFrame({})
