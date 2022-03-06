@@ -1,15 +1,14 @@
 .. _final:
 
 ************************************
-Building up the final dataset for the stockscreener
+Visualisation and Presentation using a Dash-App
 ************************************
 
 Documentation of the code in *src.final*.
 
 
 =================
-.. automodule:: src.final.product
+.. automodule:: src.Dashboard.pages.functions
     :members:
 
-.. automodule:: src.final.task_create_product
-    :members:
+

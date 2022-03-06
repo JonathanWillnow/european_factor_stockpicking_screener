@@ -6,6 +6,12 @@ Original data
 
 Documentation of the different datasets in *original_data*.
 
-In the original data section you would store the raw data, which you should not manipulate to ensure reproducibility.
 
-If you want to include multiple data sets, you can also create subfolders for the sake of a clear structure.
+Data Scraping
+=================
+The following functions are used to obtain the datasets for the different stockindicies / stockexchnages contained in *original_data* and can be found in *data_management*.
+
+
+.. automodule:: src.data_management.stockinfo_scraper
+    :members:
+

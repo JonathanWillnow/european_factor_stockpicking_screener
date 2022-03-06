@@ -13,10 +13,6 @@ Welcome to the European Factor Stockpicking and Screener project's documentation
     introduction
     original_data
     data_management
-    analysis
     final
-    model_code
-    model_specs
-    library
     paper
     references
