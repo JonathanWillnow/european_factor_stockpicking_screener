@@ -100,7 +100,7 @@ The Dash-App can be found here: \url{https://stockpickingapp.herokuapp.com}
 
 
 \section{Methodology}
-The idea apperas simple: There exist more than only one risk factor $r_f$,  that determines the
+The idea apperas simple: There exist more than only one risk factor $\beta$,  that determines the
 performance of a portfolio (here, portfolio is assumed to be a index/ market portfolio).
 ama and French came up with the Fama and French three factor model that includes
 the size of firms, their book-to-market values, and their excess return on the market. In other words, 
@@ -117,10 +117,23 @@ using the functionality of the python packe urllib.requests. The so obtained met
 used to compute the introduced factors according to the work of Fama and French. To present the 
 results and allow for easy filtering, I decided to deploy this simple Dash App.
 
+To breifly summarize the content of \cite{FF3}, the authors claim that average returns show little relation 
+to the $\beta$ found by Sharpe and Lintner, not to the intertemporal asset-pricing models of Breeden (1979) 
+and other asset-pricing models. Following this, they look into other variables that might explain average returns,
+ such as the market capitalization, leverage, price-to-earnings ratio, the book to market equity
+ value and so on and study their joint roles together with the $\beta$. To summarize the findings, 
+ $\beta$ has little information when used jointly with other variables. When used jointly, the market capitalization,
+  book-to-market equity show high explanatory power and absorp the effect of the price-to-earningsratio and the leverage.
+  Therefore, these two variables together with $\beta$ form the Fama French Three Factor Model in which the intercept 
+  is close to zero, meaning that there is only little left in the so called $\alpha$, which is 
+  traditionally claimed by mutual fund managers to be there "alpha" - their outperformance over the market.
+  Therefore, the Fama French Three Factor model almost fully explains all this outperformance, which 
+  just is related to a set of factors used by the managers and not their skill, insights, vision or whatever.
 
 \section{Code}
 As this project was part of the course Effective Programming Practices for Economists by Prof. von Gaudecker, the corresponding repository 
-that is available on github follows \citet{GaudeckerEconProjectTemplates}. The code for this repo can be found on \url{https://github.com/JonathanWillnow/european_factor_stockpicking_screener}
+that is available on github follows \citet{GaudeckerEconProjectTemplates}. 
+The code for this repo can be found on \url{https://github.com/JonathanWillnow/european_factor_stockpicking_screener}
 
 \section{How to run the code}
 Please refer to the README.md file for how to run the project and its tasks.
