@@ -1,3 +1,7 @@
+"""
+    Several functions that manually triggered to obtain the info about stocks of a specific exchange / index. 
+"""
+
 import urllib.request, json , time, os, difflib, itertools
 import pandas as pd
 import numpy as np
@@ -20,13 +24,15 @@ import datetime
 
 def get_stock_data(url, index_exchange):
     """
-    Function to fetch stock information from a specified URL of the traderfox.de website
-    with an specified index / exchange
+    Function to fetch stock information such as name and wkn from a specified URL of the traderfox.de website with an specified index / exchange. The function relies on Selenium and BeautifulSoup.
 
     Inputs:
-        url (str): one of the available urls from traderfox.de
-        index_exchange (str): name of the index / exchnage from which
-            the stocks should be selected
+        - url (str): one of the available urls from traderfox.de.
+        - index_exchange (str): name of the index / exchnage from which the stocks should be selected
+          (e.g.: Nasdaq, Amex, NYSE, ...).
+    
+    Returns:
+        - FRAME, a pd.DataFrame containing the name, wkn, and index / exchange of stocks.
     """
     browser =  webdriver.Firefox()
     time.sleep(2)
@@ -61,6 +67,22 @@ def get_stock_data(url, index_exchange):
 
 
 def get_ticker(initial_frame):
+    """
+    This function provides usefull information about a stock by its wkn. 
+    The function provides the stocks ticker, de_ticker, ISIN and the industry in which the comany is operating within.
+    The function relies on Selenium and BeautifulSoup. For security reasons, I am using a VPN / Privacy Badger to avid getting blocked while scraping, which might caus issues when you try to run it.
+    To run it, you only have to tailor the browser and the extensions used to your specific requirements.
+
+    To get all the information, I am using finanznachrichten.de and finance.yahoo.com as sources.
+
+    Inputs:
+        - initial_frame(pd.DataFrame): A pd.DataFrame contating the wkn and name of the stocks
+
+    Returns:
+        - frame, a pd.DataFrame with all the collected information.
+
+    """
+
     url_ticker = "https://www.finanznachrichten.de/"
     url_yf_ticker = "https://finance.yahoo.com/quote/FB?p=FB"
     browser =  webdriver.Firefox()
@@ -188,14 +210,18 @@ def validate_ticker(path):
 
     """
     Function to update the stock information for the different exchanges / indicies
+    The function closely follows get_ticker() and is also based on Selenium / BS4.
     This function is usefull to:
-        - check if info is up to date
-        - after adding new stocks to the {exchange / index}Stocks.csv files
-        - to check that scraping was not corruped by bad internet connection or other issues
-        - to validate the scraping
+        - check if info is up to date.
+        - after adding new stocks to the {exchange / index}Stocks.csv files.
+        - to check that scraping was not corruped by bad internet connection or other issues.
+        - to validate the scraping.
     
     Inputs:
-        path (str): path of the file for which to perform the validation
+        path (str): path of the file for which to perform the validation.
+    
+    Returns:
+        None, but saves the validated run of the file.
 
     """
     url_ticker = "https://www.finanznachrichten.de/"

@@ -2,26 +2,31 @@ import pandas as pd
 import numpy as np
 from multiprocessing.dummy import Pool
 from datetime import datetime
-import time
 import numpy as np
 import pandas as pd
-import random
 from pandas import ExcelWriter
 from bs4 import BeautifulSoup
 from scipy import stats #The SciPy stats module
-import math #The Python math module
+from pandas_datareader.famafrench import get_available_datasets
+import pandas_datareader.data as web
 
 def get_european_weights_ken_french():
-    from pandas_datareader.famafrench import get_available_datasets
-    import pandas_datareader.data as web
+    """
+    Function to obtain the historic European 5 Fama French Factors from the official webiste.
+    These will then be used for the weighting od the factors to build the final score.
+    Inputs:
+        - None
 
-    # default factor allocation due to past 6 months performance??!!
-    # -14 since factors come available with 2 months delay
-    # s_START_DATE = str(datetime.today().strftime("%Y-%m-%d").AddMonths(-8))
-    # s_END_DATE = str(datetime.today().strftime("%Y-%m-%d"))
+    Returns:
+        - pd.DataFrame with the historic average monthly performance of the factors over the market return.
+
+    """
+
+
+
 
     START_DATE = '2000-05-01'
-    END_DATE = '2022-01-22'
+    END_DATE = '2022-02-22'
 
     ff_dict = web.DataReader('Europe_5_Factors', 'famafrench', start=START_DATE, end = END_DATE) # default is monthly  #ff_dict.keys()  #print(ff_dict["DESCR"])
     factor_df = ff_dict[0]#monthly factors. 1 for annual
@@ -33,22 +38,22 @@ def get_european_weights_ken_french():
     return(adjust_weights.values)
 
 
-def calculate_precentiles(rv_dataframe):
-    from statistics import mean
-    metrics = {
-            'enterpriseValue': 'EV_percentile',
-            'priceToSalesTrailing12Months' : 'PS_percentile',
-            }
+def calculate_precentiles(rv_dataframe, metric_dict):
+    """
+    Function to calculate the percentiles of the calculated and obtained metrics. This gives the user and intuition about an particular stock compared to other stocks.
+    
+    Inputs:
+        - rv_dataframe(pd.DataFrame): A pd.DataFrame with the stockinformation.
+        - metric_dict(dict): A python dicionary with the pairs ondicating for which metrics the percentiles should be calculated.
+    
+    Returns:
+        - A pd.DataFrame with the calculated percentiles and the initial info.
 
 
-    FF_metrics = {
-            'marketCap': 'MC_percentile',
-            'priceToBook':'PB_percentile',
-            'FF_Quality_mean' : 'FFQ(inv)_m_percentile',
-            #'FF_Quality_Growth' : 'FFQ(inv)_g_percentile',
-            'FF_Assets_Growth_mean': 'FFA_m_percentile',
-    }
-    weights = [100,1,1]
+    """
+
+    FF_metrics = metric_dict
+
     ff_weights = get_european_weights_ken_french()
     print(ff_weights)
     for row in rv_dataframe.index:

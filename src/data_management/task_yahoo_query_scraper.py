@@ -1,3 +1,8 @@
+"""
+This code is used for collecting and calculating all the metrics wich will be used for https://stockpickingapp.herokuapp.com.
+
+"""
+
 from unicodedata import name
 import urllib.request, json , time, os, difflib, itertools
 from datetime import datetime
@@ -13,6 +18,17 @@ from src.config import SRC
 
 
 def get_data(stockticker):
+    """
+    Function to obtain a large amounts of mertics from finance.yahoo.com for a specific ticker. This is done by using urllib.requests and exploiting the react frontend of finance.yahoo.com.
+    
+    Inputs:
+        - stockticker(str): The homeexchange ticker of a specified stock, e.g.: BC8.F for the german Bechtle AG.
+    
+    Returns:
+        - A pd.DataFrame with metrics. For a list of the metrics that a re currently collected ahve a look at the implementation of the function.
+
+
+    """
     stock = None
 
     metrics_list = ['enterpriseValue', "marketCap",'forwardPE', "trailingPE", 'profitMargins', 'floatShares', "sharesOutstanding", 
@@ -115,6 +131,19 @@ def get_data(stockticker):
     return(frame)
 
 def calculate_FF_Quality(stock): 
+    """
+    Function to calculate the Fama French Quality Factor.
+    This factor is calculated using all accounting numbers from the end of the previous fiscal year. 
+    It is defined by the annual revenues minus the cost of goods sold, interest expenses, selling, general, and administrative expenses divided by the book equity.
+    For more informations, refer to Fama and French (2015).
+
+    Inputs:
+        - stock(str): The ticker smybol used in get_data()
+    Returns:
+        - A pd.DataFrame containing information about the metrics building up the factor and information about the factor itself. Additional I report growth rates for all emtrics and the factor. This helps indentify outliers and steady trends.
+
+
+    """
 
     Fame_French_Quality = ["totalRevenue", "costOfRevenue", "grossProfit", "sellingGeneralAdministrative", "interestExpense", "operatingIncome", "netIncomeFromContinuingOps"]
     FF_Quality_dict = {}
@@ -146,7 +175,20 @@ def calculate_FF_Quality(stock):
     return(FF_Quality_year_frame)
 
 
-def calculate_FF_CA(stock): 
+def calculate_FF_CA(stock):
+    """
+    Function to calculate the Fama French Conservative Asset Factor.
+    The Conservative Asset Factor is defined as the ratio of total assets of a stock at the fiscal year end of t−1 and the total assets at fiscal year end of t−2.
+    For more informations, refer to Fama and French (2015).
+
+    Inputs:
+        - stock(str): The ticker smybol used in get_data()
+    Returns:
+        - A pd.DataFrame containing information about the metrics building up the factor and information about the factor itself. Additional I report growth rates for all emtrics and the factor.
+
+
+
+    """ 
 
     FF_Conservative_dict = {}
     FF_Conservative_year_frame = pd.DataFrame({})
@@ -171,7 +213,15 @@ def calculate_FF_CA(stock):
 
 
 def calc_precentiles(final_frame):
+    """
+    Function to calculate percentiles of several selected metrics.
 
+    Inputs:
+        - final_frame(pd.DataFrame): pd.DataFrame with all the information and the metrics for which percentiles should be calculated.
+    Returns:
+        - The same pd.DataFrame, but now also with the calculated percentiles.
+
+    """ 
     metrics = {
             'priceToBook':'PB_percentile',
             'enterpriseValue': 'EV_percentile',
@@ -208,13 +258,20 @@ def calc_precentiles(final_frame):
 
 
 
-def clean_stock_selection(stocks):
-    return(stocks[stocks.industry != "not_found"])
-    #return(clean_stocks[clean.industry != "Finanzdienstleistungen"])
+def clean_stock_selection(uncleaned_stocks):
+    """
+    Function to perform some cleaning before using urllib.requests and finance.yahoo.com to obtain all the stockinfo.
+
+    Inputs:
+        - uncleaned_stocks(pd.DataFrame): pd.DataFrame containing the stocks (name, wkn, exchange, ticker, ISIN, ...)
+    Returns:
+        - pd.DataFrame cleaned s.t. every stock has an industry.
+
+    """ 
+    return(uncleaned_stocks[uncleaned_stocks.industry != "not_found"])
 
 def save_data(sample, path):
     sample.to_pickle(path)
-
 
 
 today = datetime.today().strftime("%Y-%m-%d")
@@ -232,6 +289,19 @@ def task_process_eu_stocks(depends_on, produces):
 
 
 def fun_process_stocks(stockinfo_pkl, datalist):
+    """
+    Function that combines the whole process of obtaining the information. This function in itself calls clean_stock_selection(), get_data() and calc_percentiles().
+    To increase the performance, this function uses ThreadPool from multiprocessing.pool. This allows multithreading.
+    The number of threads is automatically determined by the default option of ThreadPool.
+
+    Inputs:
+        - stockinfo_pkl(pd.DataFrame): A pd.DataFrame that contains the information about stocks. Must contain ticker and industry such that the function works.
+        - datalist(str): provides a namethat is incorporated into the naming of the produced file.
+    
+    Return:
+        - None, but saves a file.
+
+    """ 
 
     stocklist =  clean_stock_selection(stockinfo_pkl)
     try:
@@ -250,11 +320,11 @@ warnings.filterwarnings("ignore")
 if __name__ == "__main__":
     
     today = datetime.today().strftime("%Y-%m-%d")
-    data_ls = ["val2_de.pkl",
+    data_ls = ["val2_nikkei225.pkl",
+               "val2_de.pkl",
                "val2_euro600.pkl",
                "val2_nyse.pkl",
                "val2_nasdaq.pkl",
-               "val2_nikkei225.pkl",
                "val2_amex.pkl"]
     for datalist in data_ls:
         stockinfo_pkl = pd.read_pickle( SRC / "original_data" / datalist)  
