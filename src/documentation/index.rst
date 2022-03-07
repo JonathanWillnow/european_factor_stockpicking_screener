@@ -14,5 +14,6 @@ Welcome to the European Factor Stockpicking and Screener project's documentation
     original_data
     data_management
     final
+    dashboard
     paper
     references
