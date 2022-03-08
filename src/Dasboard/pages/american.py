@@ -5,29 +5,25 @@ import json
 import numpy as np
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input, State
-from src.config import SRC
+
 
 import yfinance as yf
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 from pages.functions import *
 
-data_input_america_1 = pd.read_pickle(
-    SRC / "final" / "processed_data" / "f_proc_2022-02-19_val2_nyse.pkl"
+data_input_america_1 = pd.read_pickle("processed_data/f_proc_2022-03-05_val2_nyse.pkl"
 )
-data_input_america_2 = pd.read_pickle(
-    SRC / "final" / "processed_data" / "f_proc_2022-02-19_val2_nasdaq.pkl"
+data_input_america_2 = pd.read_pickle("processed_data/f_proc_2022-03-05_val2_nasdaq.pkl"
 )
-data_input_america_3 = pd.read_pickle(
-    SRC / "final" / "processed_data" / "f_proc_2022-02-19_val2_amex.pkl"
+data_input_america_3 = pd.read_pickle("processed_data/f_proc_2022-03-05_val2_amex.pkl"
 )
 
-data_american_ = round(
+data_american_input = round(
     pd.concat([data_input_america_1, data_input_america_2, data_input_america_3]), 3
 )
 
-data_american = reorder_naming(data_american_)#.sort_values("ticker", inplace=True)
+data_american = reorder_naming(data_american_input)#.sort_values("ticker", inplace=True)
 
 layout = html.Div(
     children=[
@@ -36,31 +32,6 @@ layout = html.Div(
             children="Browse through the american stocks, selected from AMEX, NYSE and NASDAQ",
             className="header-description",
         ),
-        dcc.Graph(
-            figure={
-                "data": [
-                    {
-                        "x": data_american["ticker"],
-                        "y": data_american["MC"],
-                        "type": "lines",
-                    },
-                ],
-                "layout": {"title": "Average Price of Avocados"},
-            },
-        ),
-        html.Div(id="click-data-123", style={"whiteSpace": "pre-wrap"}),
-        # dcc.Graph(
-        #     figure={
-        #         "data": [
-        #             {
-        #                 "x": data_american["ticker"],
-        #                 "y": data_american["forwardPE"],
-        #                 "type": "lines",
-        #             },
-        #         ],
-        #         "layout": {"title": "Avocados Sold"},
-        #     },
-        # ),
         html.Div(
             dash.dash_table.DataTable(
                 id="table-paging-with-graph-american",
@@ -77,10 +48,10 @@ layout = html.Div(
             style={"height": 750, "overflowY": "scroll", "overflowX": "scroll"},
             # className='six columns'
         ),
-        html.H3(
-            children="Further Analysis on selected metrics.",
-            style={"textAlign": "center"},
-        ),
+        html.Div(id="click-info-am", style={"whiteSpace": "pre-wrap"}),
+        html.Div(id="click-data-am", style={"whiteSpace": "pre-wrap"}),
+         html.H3(children="Further Analysis on selected metrics.",
+        style={'textAlign': 'center', 'margin-top': '50px'}),
         html.Div(
             id="table-paging-with-graph-container-american",
             className="five columns",
@@ -204,21 +175,21 @@ def update_graph(rows):
 
 # define callback
 @dash.callback(
-    Output("click-data-123", "children"),
+    Output("click-data-am", "children"),
     [Input("table-paging-with-graph-american", "active_cell")],
     # (A) pass table as data input to get current value from active cell "coordinates"
     [State("table-paging-with-graph-american", "data")],
 )
 def display_click_data(active_cell, table_data):
     if active_cell:
-        cell = json.dumps(active_cell, indent=2)
+
         row = active_cell["row"]
-        col = active_cell["column_id"]
+
         value = table_data[row]["ticker"]
-        # out = '%s\n%s' % (cell, value)
+
     else:
-        return
-        # out = 'no cell selected'
+        return html.Div(
+       )
     dff = get_data_d(value)
     return html.Div(
         dcc.Graph(
@@ -241,3 +212,39 @@ def display_click_data(active_cell, table_data):
             },
         )
     )
+
+@dash.callback(
+    Output("click-info-am", "children"),
+    [Input("table-paging-with-graph-american", "active_cell")],
+    [State("table-paging-with-graph-american", "data")],
+)
+def display_info_data(active_cell, table_data):
+    if active_cell:
+        row = active_cell["row"]
+        value = table_data[row]["ticker"]
+    else:
+        return
+    info_dict = getBusinessSummary(value)
+    return html.Div(
+        children=[
+        html.H1(children=f"Infos about {value}",
+        style={"margin-top": "25px"},
+        className="header-title-2"),
+        html.P(
+            children=info_dict["longBusinessSummary"],
+            className="justified",
+        ), 
+        html.H5(children="Full-time employees", className="header-title-3"),
+        html.P(
+            children="Number of full-time employees: " +str(info_dict["fullTimeEmployees"]),
+            className="justified",
+        ),
+        html.H5(children="More information", className="header-title-3"),
+        html.P(
+            html.A(str(info_dict["website"]), href=str(info_dict["website"])),
+    
+            className="justified",
+        )
+        ]
+    )
+

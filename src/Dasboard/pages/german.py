@@ -5,56 +5,28 @@ import json
 import numpy as np
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input, State
-from src.config import SRC
 
 import yfinance as yf
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 from pages.functions import *
 
-data_input_ger = round(pd.read_pickle(SRC / "final" / "processed_data" / "f_proc_2022-02-20_val2_de.pkl"),3)
-data_ger = reorder_naming(data_input_ger)#.sort_values("ticker", inplace=True)
+data_input_ger = round(
+    pd.read_pickle("processed_data/f_proc_2022-03-05_val2_de.pkl"), 3
+)
+data_ger = reorder_naming(data_input_ger)  # .sort_values("ticker", inplace=True)
 
 layout = html.Div(
     children=[
-        html.H1(children="German Stocks",
-        className="header-title"),
+        html.H1(children="German Stocks", className="header-title"),
         html.P(
             children="Browse through the german Stocks",
             className="header-description",
         ),
-        dcc.Graph(
-            figure={
-                "data": [
-                    {
-                        "x": data_ger["ticker"],
-                        "y": data_ger["MC"],
-                        "type": "lines",
-                    },
-                ],
-                "layout": {"title": "Average Price of Avocados"},
-            },
-        ),
-        html.Div(id="click-data-ger", style={"whiteSpace": "pre-wrap"}),
-        # dcc.Graph(
-        #     figure={
-        #         "data": [
-        #             {
-        #                 "x": data_ger["ticker"],
-        #                 "y": data_ger["forwardPE"],
-        #                 "type": "lines",
-        #             },
-        #         ],
-        #         "layout": {"title": "Avocados Sold"},
-        #     },
-        # ),
-         html.Div(
+        html.Div(
             dash.dash_table.DataTable(
-                id='table-paging-with-graph-ger',
-                columns=[
-                    {"name": i, "id": i} for i in data_ger.columns
-                ],
+                id="table-paging-with-graph-ger",
+                columns=[{"name": i, "id": i} for i in data_ger.columns],
                 page_current=0,
                 page_size=20,
                 page_action="custom",
@@ -67,27 +39,31 @@ layout = html.Div(
             style={"height": 750, "overflowY": "scroll", "overflowX": "scroll"},
             # className='six columns'
         ),
-        html.H3(children="Further Analysis on selected metrics.",
-        style={'textAlign': 'center'}),
+        html.Div(id="click-info-ger", style={"whiteSpace": "pre-wrap"}),
+        html.Div(id="click-data-ger", style={"whiteSpace": "pre-wrap"}),
+        html.H3(
+            children="Further Analysis on selected metrics.",
+            style={"textAlign": "center", "margin-top": "50px"},
+        ),
         html.Div(
-            id='table-paging-with-graph-container-ger',
+            id="table-paging-with-graph-container-ger",
             className="five columns",
-
             style={"margin-top": "25px"},
         ),
-        ]
-    )
-        
-    
+    ]
+)
 
-operators = [['ge ', '>='],
-             ['le ', '<='],
-             ['lt ', '<'],
-             ['gt ', '>'],
-             ['ne ', '!='],
-             ['eq ', '='],
-             ['contains '],
-             ['datestartswith ']]
+
+operators = [
+    ["ge ", ">="],
+    ["le ", "<="],
+    ["lt ", "<"],
+    ["gt ", ">"],
+    ["ne ", "!="],
+    ["eq ", "="],
+    ["contains "],
+    ["datestartswith "],
+]
 
 
 def split_filter_part(filter_part):
@@ -95,12 +71,12 @@ def split_filter_part(filter_part):
         for operator in operator_type:
             if operator in filter_part:
                 name_part, value_part = filter_part.split(operator, 1)
-                name = name_part[name_part.find('{') + 1: name_part.rfind('}')]
+                name = name_part[name_part.find("{") + 1 : name_part.rfind("}")]
 
                 value_part = value_part.strip()
                 v0 = value_part[0]
-                if (v0 == value_part[-1] and v0 in ("'", '"', '`')):
-                    value = value_part[1: -1].replace('\\' + v0, v0)
+                if v0 == value_part[-1] and v0 in ("'", '"', "`"):
+                    value = value_part[1:-1].replace("\\" + v0, v0)
                 else:
                     try:
                         value = float(value_part)
@@ -115,45 +91,44 @@ def split_filter_part(filter_part):
 
 
 @dash.callback(
-    Output('table-paging-with-graph-ger', "data"),
-    Input('table-paging-with-graph-ger', "page_current"),
-    Input('table-paging-with-graph-ger', "page_size"),
-    Input('table-paging-with-graph-ger', "sort_by"),
-    Input('table-paging-with-graph-ger', "filter_query"))
+    Output("table-paging-with-graph-ger", "data"),
+    Input("table-paging-with-graph-ger", "page_current"),
+    Input("table-paging-with-graph-ger", "page_size"),
+    Input("table-paging-with-graph-ger", "sort_by"),
+    Input("table-paging-with-graph-ger", "filter_query"),
+)
 def update_table(page_current, page_size, sort_by, filter):
-    filtering_expressions = filter.split(' && ')
+    filtering_expressions = filter.split(" && ")
     dff = data_ger
     for filter_part in filtering_expressions:
         col_name, operator, filter_value = split_filter_part(filter_part)
 
-        if operator in ('eq', 'ne', 'lt', 'le', 'gt', 'ge'):
+        if operator in ("eq", "ne", "lt", "le", "gt", "ge"):
             # these operators match pandas series operator method names
             dff = dff.loc[getattr(dff[col_name], operator)(filter_value)]
-        elif operator == 'contains':
+        elif operator == "contains":
             dff = dff.loc[dff[col_name].str.contains(filter_value)]
-        elif operator == 'datestartswith':
+        elif operator == "datestartswith":
             # this is a simplification of the front-end filtering logic,
             # only works with complete fields in standard format
             dff = dff.loc[dff[col_name].str.startswith(filter_value)]
 
     if len(sort_by):
         dff = dff.sort_values(
-            [col['column_id'] for col in sort_by],
-            ascending=[
-                col['direction'] == 'asc'
-                for col in sort_by
-            ],
-            inplace=False
+            [col["column_id"] for col in sort_by],
+            ascending=[col["direction"] == "asc" for col in sort_by],
+            inplace=False,
         )
 
-    return dff.iloc[
-        page_current*page_size: (page_current + 1)*page_size
-    ].to_dict('records')
+    return dff.iloc[page_current * page_size : (page_current + 1) * page_size].to_dict(
+        "records"
+    )
 
 
 @dash.callback(
-    Output('table-paging-with-graph-container-ger', "children"),
-    Input('table-paging-with-graph-ger', "data"))
+    Output("table-paging-with-graph-container-ger", "children"),
+    Input("table-paging-with-graph-ger", "data"),
+)
 def update_graph(rows):
     dff = pd.DataFrame(rows)
     return html.Div(
@@ -173,13 +148,12 @@ def update_graph(rows):
                         "xaxis": {"automargin": True},
                         "yaxis": {"automargin": True},
                         "height": 350,
-                        'title': column,
+                        "title": column,
                         "margin": {"t": 35, "l": 10, "r": 10},
                     },
                 },
-                
             )
-           for column in [
+            for column in [
                 "Score",
                 "P/B",
                 "FFA",
@@ -190,6 +164,7 @@ def update_graph(rows):
             ]
         ]
     )
+
 
 # define callback
 @dash.callback(
@@ -206,8 +181,7 @@ def display_click_data(active_cell, table_data):
         value = table_data[row]["ticker"]
         # out = '%s\n%s' % (cell, value)
     else:
-        return
-        # out = 'no cell selected'
+        return html.Div()
     dff = get_data_d(value)
     return html.Div(
         dcc.Graph(
@@ -231,3 +205,40 @@ def display_click_data(active_cell, table_data):
         )
     )
 
+
+@dash.callback(
+    Output("click-info-ger", "children"),
+    [Input("table-paging-with-graph-ger", "active_cell")],
+    [State("table-paging-with-graph-ger", "data")],
+)
+def display_info_data(active_cell, table_data):
+    if active_cell:
+        row = active_cell["row"]
+        value = table_data[row]["ticker"]
+    else:
+        return html.Div()
+    info_dict = getBusinessSummary(value)
+    return html.Div(
+        children=[
+            html.H1(
+                children=f"Infos about {value}",
+                style={"margin-top": "25px"},
+                className="header-title-2",
+            ),
+            html.P(
+                children=info_dict["longBusinessSummary"],
+                className="justified",
+            ),
+            html.H5(children="Full-time employees", className="header-title-3"),
+            html.P(
+                children="Number of full-time employees: "
+                + str(info_dict["fullTimeEmployees"]),
+                className="justified",
+            ),
+            html.H5(children="More information", className="header-title-3"),
+            html.P(
+                html.A(str(info_dict["website"]), href=str(info_dict["website"])),
+                className="justified",
+            ),
+        ]
+    )

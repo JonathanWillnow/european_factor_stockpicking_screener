@@ -15,15 +15,16 @@ layout = html.Div(
             ],
             className="justified",
         ),
+        html.H5(children="Contatct", className="header-title-2"),
         html.P(
             children=[
-                html.H5(children="Contatct", className="header-title-2"),
-                html.P(
-                    children="Feel free to contact me via Github, LinkedIn or my Email!",
-                    className="justified"
-            
-                )
-            ]
-        )
+                "Feel free to contact me via Github or ",
+                html.A(
+                    "LinkedIn",
+                    href="https://www.linkedin.com/in/jonathan-willnow-1672881ab/",
+                ),
+            ],
+            className="justified",
+        ),
     ]
 )

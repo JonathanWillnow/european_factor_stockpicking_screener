@@ -7,6 +7,7 @@ import pandas as pd
 from pages import landing_page, european, german, american, japanese, documentation, impressum
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX])
+server = app.server
 
 
 # styling the sidebar
