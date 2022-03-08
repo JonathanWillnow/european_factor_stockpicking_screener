@@ -14,7 +14,7 @@ There are three files that list the requirements for this project:
 - environment.yaml contains all reqquirements to build the output/product from the scraped data
 - requirements.txt contains all requirements to run the DashApp alone
 
-Updating the environment from environment.yml to try out the scraper can be done by:
+Example: Updating the environment from environment.yml to try out the scraper can be done by:
 
 `conda activate stockpicking_screener`
 
