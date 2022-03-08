@@ -1,9 +1,7 @@
-name: stockpicking_screener
+name: stockpicking_screener_env
 channels:
   - conda-forge
   - plotly
-
-  - r
 
 dependencies:
   - conda-build
@@ -17,21 +15,10 @@ dependencies:
 
   - pytask-r>=0.0.9
 
-
   - pytest
   - pytest-cov
   - python=3.9
   - python-graphviz
-
-  - r-aer
-  - r-aod
-  - r-base
-  - r-car
-  - r-essentials
-  - r-rjson
-  - r-lmtest
-  - r-sandwich
-
 
   - virtualenv=20.0.33
 
@@ -46,9 +33,8 @@ dependencies:
     - sphinxcontrib-bibtex
 
     - numpy
-    - urllib.requests
+    - urllib3
     - yfinance
-    - seaborn
     - statsmodels
     - intrinio_sdk
     - pandas_datareader
