@@ -1,4 +1,4 @@
-# european_factor_stockpicking_screener
+# European Factor Stockpicking / Stockscreener
 This project provides an automatization of stockscreening of international stocks and helps the individualinvetor to construct her/his portfolio, based on common Asset-Pricing Factors.
 
 I decided to deploy my results as an Dash-App on Heroku. This allows users to access my results and my research without having a proper background in programming and git.
