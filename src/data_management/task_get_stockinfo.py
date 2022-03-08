@@ -19,10 +19,6 @@ from src.data_management.stockinfo_scraper import get_stock_data
 def save_data(sample, path):
     sample.to_pickle(path)
 
-# @pytask.mark.produces(SRC / "data_management" / "data" / "de_initial.pkl")
-# def task_get_DEStocks(produces):
-#     file = get_stock_data("https://traderfox.de/aktien/deutschland-160-bestandteile", "DE")
-#     save_data(file, produces)
 
 @pytask.mark.produces(SRC / "original_data" / "TASKeurostoxx600_initial.pkl")
 def task_get_EuroStoxx600Stocks(produces):
@@ -30,11 +26,21 @@ def task_get_EuroStoxx600Stocks(produces):
     Pytask function to get all the stocks by name and wkn of the EuroStoxx600. If this works on your machine, a firefox browser is opened and used to scape the data.
 
     """
-    file = get_stock_data("https://traderfox.de/aktien/stoxx-europe-600-bestandteile", "EuroStoxx600")
+    file = get_stock_data(
+        "https://traderfox.de/aktien/stoxx-europe-600-bestandteile", "EuroStoxx600"
+    )
     save_data(file, produces)
+
+
+# More tasks, but commented out for now
+
+# @pytask.mark.produces(SRC / "data_management" / "data" / "de_initial.pkl")
+# def task_get_DEStocks(produces):
+#     file = get_stock_data("https://traderfox.de/aktien/deutschland-160-bestandteile", "DE")
+#     save_data(file, produces)
+
 
 # @pytask.mark.produces(SRC / "data_management" / "data" / "nyse_initial.pkl")
 # def task_get_NYSEStocks(produces):
 #     file = get_stock_data("https://traderfox.de/aktien/alle-nyse-aktien-bestandteile", "NYSE")
 #     save_data(file, produces)
-
