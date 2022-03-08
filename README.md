@@ -11,7 +11,7 @@ Since I was determined to deploy the project as a Dash-App, I decided to move pa
 ## Requirements
 There are three files that list the requirements for this project:
 - scraper_env.yml contains all requirements that are needed to use the scrapers.
-- environment.yaml contains all reqquirements to build the output/product from the scraped data
+- environment.yml contains all reqquirements to build the output/product from the scraped data
 - requirements.txt contains all requirements to run the DashApp alone
 
 Example: Updating the environment from environment.yml to try out the scraper can be done by:
@@ -20,7 +20,7 @@ Example: Updating the environment from environment.yml to try out the scraper ca
 
 `conda env update --file sraper_env.yml --prune`
 
-Since the requirements for the Dash-App are also contained in the environment.yml, I recommend to use the environment.yml file if you just want to have a look at the tasks and processes involved in the building of the final product. If you want to try the scraping, go ahead but keep in mind that it will take several hours/ days to scrape all the stocks and at least hours to scrape the corresponding metrics and numbers.
+Since the requirements for the Dash-App are also contained in the environment.yml, I recommend to use the environment.yml file if you just want to have a look at the tasks and processes involved in the building of the final product. If you want to try the scraping, go ahead but keep in mind that it will take several hours/ days to scrape all the stocks and at least hours to scrape the corresponding metrics and numbers. Also, you might into problems since some files like geckodriver need to be installed on your machine to execute all the scraping.
 
 ## Usage of pytask
 Througggout the project I will make use of pytask. I even used pytask for scraping and showed that it works, but I also implemented all functionality in the form of scripts.
@@ -28,7 +28,7 @@ Througggout the project I will make use of pytask. I even used pytask for scrapi
 The longterm idea for this is that the project runs continously on a seperat machine and scrapes the stocks, for instance every weekend or every two weeks at a fixed time. Therefore, I want to use the functionality of crontab, which is a demon on unix to start processes timely. Since I did not figure out how to use crontab together with pytask, I designed the project such that I can simply call the .py files. This is subject to change in the future since I more and more enjoy the possibilities that pytask provides.
 
 ## Work in progress
-This project is not finished and work in progress. After I started it for the course Effective Programming Practices for Economists, I became aware of all the possible extensions that I could develop and implement. As outlined in the beginning, I want to make it Open Source and find contributers after the grading for EPP is done
+This project is not finished and work in progress. After I started it for the course Effective Programming Practices for Economists, I became aware of all the possible extensions that I could develop and implement. As outlined in the beginning, I want to make it Open Source and find contributers after the grading for EPP is done.
 
 
 
