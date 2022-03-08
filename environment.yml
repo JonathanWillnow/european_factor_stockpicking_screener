@@ -1,4 +1,4 @@
-name: stockpicking_screener_env2
+name: env_stockpicking_screener
 channels:
   - conda-forge
   - plotly
