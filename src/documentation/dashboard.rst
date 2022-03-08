@@ -1,14 +1,16 @@
-.. _final:
+.. _dashboard:
 
 ************************************
 Visualisation and Presentation using a Dash-App
 ************************************
 
-Documentation of the code in *src.final*.
+Documentation of the code in *src.dashoard.pages*. 
 
 Dashboard
 =================
-.. automodule:: src.Dashboard.pages.functions
+
+.. automodule:: src.dashboard.pages
     :members:
+
 
 

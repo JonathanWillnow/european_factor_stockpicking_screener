@@ -17,3 +17,6 @@ Stockinfo Scraping
 .. automodule:: src.data_management.stockinfo_scraper
     :members:
 
+.. automodule:: src.data_management.task_get_stockinfo
+    :members:
+
