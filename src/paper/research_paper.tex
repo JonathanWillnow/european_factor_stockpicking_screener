@@ -130,10 +130,19 @@ and other asset-pricing models. Following this, they look into other variables t
   Therefore, the Fama French Three Factor model almost fully explains all this out-performance, which 
   just is related to a set of factors used by the managers and not their skill, insights, vision or whatever.
 
+  In \cite{FAMA20151}, the two authors developed two more factors, namely the Quality factor and the conservatism asset factor.
+  The quality factor is calculated using all accounting numbers from the end of the previous fiscal year.
+  It is defined by the annual revenues minus the cost of goods sold, interest expenses, selling, general, and administrative expenses divided by the book equity.
+ The Conservative Asset Factor is defined as the ratio of total assets of a stock at the fiscal year end of $t-1$ and the total assets at fiscal year end of $t-2$.
+ Adding these factors to the Fama French Three Factor Model, this 5 factors build the Fama French Five Factor Model that I used for this project to construct the score.
+ The score uses as a weighting of the different five factors their historical out-performance over the market return, which is obtained from the Fama French 
+ webiste \url{https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html} for all the different regions where data is available. 
+
 \section{Code}
 As this project was part of the course Effective Programming Practices for Economists by Prof. von Gaudecker, the corresponding repository 
 that is available on github follows \citet{GaudeckerEconProjectTemplates}. It offers great help in structuring and publishing a project. 
-The code for this repo can be found on \url{https://github.com/JonathanWillnow/european_factor_stockpicking_screener}. Since I will be searching for collaboraters in the future, I will keep it public.
+The code for this repo can be found on \url{https://github.com/JonathanWillnow/european_factor_stockpicking_screener}. 
+Since I will be searching for collaboraters in the future, I will keep it public.
 
 \section{How to run the code}
 Please refer to the README.md file or the corresponding part within the documentation for how to run the project and its tasks.
@@ -143,14 +152,21 @@ This is work in progress. This project is not finished and work in progress. Aft
 I became aware of all the possible extensions that I could develop and implement. 
 As outlined, I want to make it Open Source and will try to find other coding and finance enthusiasts who want to work with me on this project.
 Some things that are in my mind:
-- Risk analysis for the stocks using volatility, downside volatility
-- Moving from Dash to a pure Flask . This would be faster and enables more possibilities
-- Scaling up the website (this would require me to pay fees to Heroku. As for now, the service I am using is free). This also includes using a cloud solution for hosting the data.
-- Adding more stocks! I was thinking about every major stock exchange in europe and also including more emerging markets stocks.
-- Detecting outliers and anomalies / better filtering of the results.
-- Fixing my Score. Right now, the score is subject to outliers. For instance bancrupt companies show great scores since they have a low MC and a low P/B ratio. But I have to find a way to make the score robust to this.
-- Back-testing my Score
-- Improving general code quality and speed.
+\begin{itemize}
+    \item Risk analysis for the stocks using volatility, downside volatility
+    \item Moving from Dash to a pure Flask . This would be faster and enables more possibilities    
+    \item Scaling up the website (this would require me to pay fees to Heroku. As for now, the service I am using is free). This also includes using a cloud solution for hosting the data
+    \item Adding more stocks! I was thinking about every major stock exchange in europe and also including more emerging markets stocks
+    \item Detecting outliers and anomalies / better filtering of the results
+    \item Fixing my Score:
+    \begin{itemize}
+        \item Right now, the score is subject to outliers that might be the result of wrong data or circumstances that can not easily identified
+        \item For instance bancrupt companies show great scores since they have a low MC and a low P/B ratio
+        \item I have to find a way to make the score robust to this problematic
+    \end{itemize} 
+    \item Back-testing my Score
+    \item Improving general code quality and speed
+\end{itemize}
 
 
 
