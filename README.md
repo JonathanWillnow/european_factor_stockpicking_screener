@@ -8,10 +8,8 @@ Furthermore, I plan to publish it to contribute back to the people that helped m
 
 The code that is used for this App is the same as you can find in this repo in the folder src/Dashboard since I cannot publish the repository that is deployed on Heroku. You can therefore also locally run the Dash-App, but you can also just check it out at https://stockpickingapp.herokuapp.com.
 ## Documentation and Idea
-Since I was determined to deploy the project as a Dash-App, I decided to move part of it on the web. This repo just contains the documentation of the functions, while the motivation and idea behind this project can be found at https://stockpickingapp.herokuapp.com/documentation, but also partly in the research paper of this project.
+Since I was determined to deploy the project as a Dash-App, I decided to move part of it on the web. This repo just contains the [documentation](https://github.com/JonathanWillnow/european_factor_stockpicking_screener/blob/master/project_documentation.pdf) of the functions, while the motivation and idea behind this project can be found at https://stockpickingapp.herokuapp.com/documentation, but also partly in the [research paper](https://github.com/JonathanWillnow/european_factor_stockpicking_screener/blob/master/src/paper/research_paper.pdf) of this project.
 
-The research paper to this project can be found [here](https://github.com/JonathanWillnow/european_factor_stockpicking_screener/blob/master/src/paper/research_paper.pdf)
-and the documentation can be found [here](https://github.com/JonathanWillnow/european_factor_stockpicking_screener/blob/master/project_documentation.pdf).
 ## Requirements
 
 The file *environment.yml* contains all requirements to run all functions. This includes running all the different scrapers and a local version of the Dash App.
@@ -32,7 +30,7 @@ Throughout the project I will make use of pytask. I even used pytask for scrapin
 The longterm idea for this is that the project runs continously on a seperat machine like a Raspberry PI and scrapes the stocks, for instance every weekend or every two weeks at a fixed time. Therefore, I want to use the functionality of crontab, which is a demon on unix to start processes timely. Since I did not figure out how to use crontab together with pytask, I designed the project such that I can simply call the *.py files. This might be subject to change in the future since I more and more enjoy the possibilities and functionality that pytask provides.
 
 ## Work in progress
-This project is not finished and work in progress. After I started it for the course Effective Programming Practices for Economists, I became aware of all the possible extensions that I could develop and implement. As outlined in the beginning, I want to make it Open Source and find contributers after the grading for EPP is done. More possible extensions are listed https://stockpickingapp.herokuapp.com/documentation but also in the research_paper.pdf
+This project is not finished and work in progress. After I started it for the course Effective Programming Practices for Economists, I became aware of all the possible extensions that I could develop and implement. As outlined in the beginning, I want to make it Open Source and find contributers after the grading for EPP is done. More possible extensions are listed https://stockpickingapp.herokuapp.com/documentation but also in the [research paper](https://github.com/JonathanWillnow/european_factor_stockpicking_screener/blob/master/src/paper/research_paper.pdf)
 
 
 
