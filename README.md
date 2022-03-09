@@ -9,13 +9,17 @@ Furthermore, I plan to publish it to contribute back to the people that helped m
 The code that is used for this App is the same as you can find in this repo in the folder src/Dashboard since I cannot publish the repository that is deployed on Heroku. You can therefore also locally run the Dash-App, but you can also just check it out at https://stockpickingapp.herokuapp.com.
 ## Documentation and Idea
 Since I was determined to deploy the project as a Dash-App, I decided to move part of it on the web. This repo just contains the documentation of the functions, while the motivation and idea behind this project can be found at https://stockpickingapp.herokuapp.com/documentation, but also partly in the research paper of this project.
+
+The research paper to this project can be found <a href="https://https://github.com/JonathanWillnow/european_factor_stockpicking_screener/blob/master/src/paper/research_paper.tex"
+   target="_parent">
+</a>
 ## Requirements
 
 The file *environment.yml* contains all requirements to run all functions. This includes running all the different scrapers and a local version of the Dash App.
 
-If you want to try the scraping you should expect some problems with some paths to extensions that I used for secure scraping. Also, keep in mind that it will take several hours / days to scrape all the stocks and at least hours to scrape the corresponding metrics and numbers. Also, you might into problems since some files like geckodriver need to be installed on your machine to execute all the scraping.
+If you want to try the scraping you should expect some problems with some paths to extensions that I used tailored to my machine for secure scraping. Also, keep in mind that it will take several hours / days to scrape all the stocks and at least hours to scrape the corresponding metrics and numbers (Took me arround 20h to scrape all NASDAQ stocks). Also, you might run into problems since some files like geckodriver need to be installed on your machine to execute all the scraping, but once you have fixed this, the scrapers are running.
 
-*Installing the requirements can be done with* `conda env create -f environment.yml`
+*Installing all the  the requirements can be done with* `conda env create -f environment.yml`.
 
 *Do not forget to use* `conda develop .` *before you try to run anything once the requirements are satisfied.*
 
