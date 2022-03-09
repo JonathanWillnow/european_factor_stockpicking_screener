@@ -10,7 +10,7 @@ The code that is used for this App is the same as you can find in this repo in t
 ## Documentation and Idea
 Since I was determined to deploy the project as a Dash-App, I decided to move part of it on the web. This repo just contains the documentation of the functions, while the motivation and idea behind this project can be found at https://stockpickingapp.herokuapp.com/documentation, but also partly in the research paper of this project.
 
-The research paper to this project can be found [a link](https://github.com/JonathanWillnow/european_factor_stockpicking_screener/blob/master/src/paper/research_paper.tex)
+The research paper to this project can be found [here](https://github.com/JonathanWillnow/european_factor_stockpicking_screener/blob/master/src/paper/research_paper.tex)
 ## Requirements
 
 The file *environment.yml* contains all requirements to run all functions. This includes running all the different scrapers and a local version of the Dash App.
