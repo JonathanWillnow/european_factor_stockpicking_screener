@@ -42,7 +42,7 @@ layout = html.Div(
         html.Div(id="click-info-eu", style={"whiteSpace": "pre-wrap"}),
         html.Div(id="click-data-eu", style={"whiteSpace": "pre-wrap"}),
         html.H3(
-            children="Further Analysis on selected metrics.",
+            children="Further Analysis on selected metrics",
             style={"textAlign": "center", "margin-top": "50px"},
         ),
         html.Div(

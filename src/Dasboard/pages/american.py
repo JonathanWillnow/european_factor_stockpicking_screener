@@ -50,7 +50,7 @@ layout = html.Div(
         ),
         html.Div(id="click-info-am", style={"whiteSpace": "pre-wrap"}),
         html.Div(id="click-data-am", style={"whiteSpace": "pre-wrap"}),
-         html.H3(children="Further Analysis on selected metrics.",
+         html.H3(children="Further Analysis on selected metrics",
         style={'textAlign': 'center', 'margin-top': '50px'}),
         html.Div(
             id="table-paging-with-graph-container-american",
